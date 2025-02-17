@@ -13,92 +13,109 @@ router = APIRouter()
 # Dependency for user authentication, assuming JWT-based authentication
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
-# Get User Profile
-@router.get("/users/{user_id}", response_model=UserProfile)
+# Get user profile
+@router.get("/users/{user_id}", response_model=UserProfile, status_code=200)
 async def get_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    try:
+        if str(current_user["user_id"]) != str(user_id) and current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        user = await users_collection.find_one({"user_id": int(user_id)})
 
-    if str(current_user["user_id"]) != str(user_id) and current_user["role"] != "admin":
-        raise HTTPException(status_code=403, detail="Not authorized")
-    
-    user = await users_collection.find_one({"user_id": int(user_id)})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
 
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        return UserProfile(**user)
 
-    return UserProfile(**user)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching user: {str(e)}")
 
 
 # Update User Profile
-@router.put("/users/{user_id}", response_model=UserProfile)
+@router.put("/users/{user_id}", response_model=UserProfile,status_code=200)
 async def update_user(user_id: str, user_update: UserUpdateRequest, current_user: dict = Depends(get_current_user)):
-    logging.info(f"Attempting to update user {user_id} by {current_user}")  # Debugging log
+    try:
+        logging.info(f"Attempting to update user {user_id} by {current_user}")  # Debugging log
 
-    # Ensure user_id is a string for proper comparison
-    user_id_str = str(user_id)
-    current_user_id_str = str(current_user["user_id"])
+        # Ensure user_id is a string for proper comparison
+        user_id_str = str(user_id)
+        current_user_id_str = str(current_user["user_id"])
 
-    # Authorization check: Allow self-update or admin access
-    if current_user_id_str != user_id_str and current_user["role"] != "admin":
-        logging.warning(f"Unauthorized update attempt by {current_user}")
-        raise HTTPException(status_code=403, detail="Not authorized")
+        # Authorization check: Allow self-update or admin access
+        if current_user_id_str != user_id_str and current_user["role"] != "admin":
+            logging.warning(f"Unauthorized update attempt by {current_user}")
+            raise HTTPException(status_code=403, detail="Not authorized")
 
-    # Find user in the database
-    user = await users_collection.find_one({"user_id": int(user_id)})
-    if not user:
-        logging.error(f"User {user_id} not found")
-        raise HTTPException(status_code=404, detail="User not found")
+        # Find user in the database
+        user = await users_collection.find_one({"user_id": int(user_id)})
+        if not user:
+            logging.error(f"User {user_id} not found")
+            raise HTTPException(status_code=404, detail="User not found")
 
-    # Apply only the provided updates
-    updated_fields = user_update.dict(exclude_unset=True)  # Ignore unset fields
+        # Apply only the provided updates
+        updated_fields = user_update.dict(exclude_unset=True)  # Ignore unset fields
 
-    if not updated_fields:
-        logging.info(f"No fields provided for update in user {user_id}")
-        raise HTTPException(status_code=400, detail="No updates provided")
+        if not updated_fields:
+            logging.info(f"No fields provided for update in user {user_id}")
+            raise HTTPException(status_code=400, detail="No updates provided")
 
-    # Update the database only with provided fields
-    update_result = await users_collection.update_one(
-        {"user_id": int(user_id)}, {"$set": updated_fields}
-    )
+        # Update the database only with provided fields
+        update_result = await users_collection.update_one(
+            {"user_id": int(user_id)}, {"$set": updated_fields}
+        )
 
-    if update_result.modified_count == 0:
-        logging.warning(f"No changes made to user {user_id}")
+        if update_result.modified_count == 0:
+            logging.warning(f"No changes made to user {user_id}")
 
-    # Fetch updated user
-    updated_user = await users_collection.find_one({"user_id": int(user_id)})
-    return UserProfile(**updated_user)
+        # Fetch updated user
+        updated_user = await users_collection.find_one({"user_id": int(user_id)})
+        return UserProfile(**updated_user)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error updating user: {str(e)}")
 
 
 # Delete User Account
-@router.delete("/users/{user_id}", response_model=dict)
+@router.delete("/users/{user_id}", response_model=dict,status_code=200)
 async def delete_user(user_id: str, current_user: dict = Depends(get_current_user)):
-    if current_user["user_id"] != user_id and current_user["role"] != "admin":
-        raise HTTPException(status_code=403, detail="Not authorized")
-    
-    user = await users_collection.find_one({"user_id": int(user_id)})
-    
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    
-    # Delete the user from the database
-    await users_collection.delete_one({"user_id": int(user_id)})
-    
-    return {"message": f"User with id {user_id} has been deleted"}
+    try:
+        if current_user["user_id"] != user_id and current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        user = await users_collection.find_one({"user_id": int(user_id)})
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        
+        # Delete the user from the database
+        await users_collection.delete_one({"user_id": int(user_id)})
+        
+        return {"message": f"User with id {user_id} has been deleted"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error deleting user: {str(e)}")
+
 
 # Get a List of All Users (Admin Only)
-@router.get("/users/", response_model=List[UserProfile])
+@router.get("/users/", response_model=List[UserProfile],status_code=200)
 async def get_all_users(current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "admin":
-        raise HTTPException(status_code=403, detail="Not authorized")
-    
-    users = await users_collection.find().to_list(100)  # Fetch all users
+    try:
+        if current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Not authorized")
+        
+        users = await users_collection.find().to_list(100)  # Fetch all users
 
-    # Filter out users with role 'admin'
-    filtered_users = [user for user in users if user.get("role") != "admin"]
+        # Filter out users with role 'admin'
+        filtered_users = [user for user in users if user.get("role") != "admin"]
 
-    return [UserProfile(**user) for user in filtered_users]
+        return [UserProfile(**user) for user in filtered_users]
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching users: {str(e)}")
 
 
-@router.post("/contact/submit", response_model=dict)
+# Submit contact query
+@router.post("/contact/submit", response_model=dict,status_code=200)
 async def submit_contact_query(contact: Contactquery):
     try:
         contact_data = jsonable_encoder(contact)
@@ -113,9 +130,11 @@ async def submit_contact_query(contact: Contactquery):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error submitting contact query: {str(e)}")
+
+
     
     
-@router.get("/contact/all", response_model=dict)
+@router.get("/contact/all", response_model=dict,status_code=200)
 async def get_all_contact_queries():
     try:
         contacts_cursor = contact_collection.find()

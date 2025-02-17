@@ -1,5 +1,5 @@
 import jwt
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from db import users_collection
 from models import UserProfile  
@@ -94,75 +94,90 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     return user
 
 # 1. Register User
-@router.post("/auth/register")
+@router.post("/auth/register",status_code=status.HTTP_201_CREATED)
 async def create_user(user: UserProfile):
-    hashed_password = hash_password(user.password)
-    
-    last_user = await users_collection.find_one(sort=[("user_id", -1)])
-    next_user_id = 1 if last_user is None else last_user["user_id"] + 1
+    try:
+        hashed_password = hash_password(user.password)
+        
+        last_user = await users_collection.find_one(sort=[("user_id", -1)])
+        next_user_id = 1 if last_user is None else last_user["user_id"] + 1
 
-    user_data = jsonable_encoder(user)
-    user_data["user_id"] = next_user_id
-    user_data["password"] = hashed_password
-    user_data.setdefault("role", "customer")
+        user_data = jsonable_encoder(user)
+        user_data["user_id"] = next_user_id
+        user_data["password"] = hashed_password
+        user_data.setdefault("role", "customer")
 
-    result = await users_collection.insert_one(user_data)
+        result = await users_collection.insert_one(user_data)
 
-    # Convert ObjectId to string
-    user_data["_id"] = str(result.inserted_id)
-    user_data.pop("password", None)  # Remove password before returning
+        # Convert ObjectId to string
+        user_data["_id"] = str(result.inserted_id)
+        user_data.pop("password", None)  # Remove password before returning
 
-    return user_data
-
+        return user_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"User registration failed: {str(e)}")
 
 
 # 2. Login User
-@router.post("/auth/login")
+@router.post("/auth/login",status_code=status.HTTP_200_OK)
 async def authenticate_user(login_request: LoginRequest):
-    user = await get_user_by_email(login_request.email)
-    
-    if not user or not verify_password(login_request.password, user["password"]):
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    try:
+        user = await get_user_by_email(login_request.email)
+        
+        if not user or not verify_password(login_request.password, user["password"]):
+            raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    token = create_jwt_token(str(user["user_id"]))
+        token = create_jwt_token(str(user["user_id"]))
 
-    return {
-        "access_token": token,
-        "token_type": "bearer",
-        "user": {
-            "user_id": user["user_id"],
-            "email": user["email"],
-            "first_name": user.get("first_name"),
-            "last_name": user.get("last_name"),
-            "address": user.get("address"),
-            "phone_number": user.get("phone_number"),
-            "role": user["role"]
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+            "user": {
+                "user_id": user["user_id"],
+                "email": user["email"],
+                "first_name": user.get("first_name"),
+                "last_name": user.get("last_name"),
+                "address": user.get("address"),
+                "phone_number": user.get("phone_number"),
+                "role": user["role"]
+            }
         }
-    }
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
 # 3. Get Current User
-@router.get("/auth/me", response_model=UserResponse)
+@router.get("/auth/me", response_model=UserResponse,status_code=status.HTTP_200_OK)
 async def get_current_user_profile(current_user: dict = Depends(get_current_user)):
-    return UserResponse(**current_user)
+    try:
+        return UserResponse(**current_user)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve user profile: {str(e)}")
 
 # 4. Logout User (invalidate token)
-@router.post("/auth/logout")
+@router.post("/auth/logout",status_code=status.HTTP_200_OK)
 async def logout_user(token: str = Depends(oauth2_scheme)):
-    user_id = decode_jwt_token(token)
+    try:
+        user_id = decode_jwt_token(token)
 
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        if not user_id:
+            raise HTTPException(status_code=401, detail="Invalid token")
 
-    user = await users_collection.find_one({"user_id": int(user_id)}, {"username": 1, "email": 1})
+        user = await users_collection.find_one({"user_id": int(user_id)}, {"username": 1, "email": 1})
 
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
 
-    blacklisted_tokens.add(token)  # Add token to blacklist
+        blacklisted_tokens.add(token)  # Add token to blacklist
 
-    return {
-        "message": "User logged out successfully",
-        "user": {
-            "email": user["email"]
+        return {
+            "message": "User logged out successfully",
+            "user": {
+                "email": user["email"]
+            }
         }
-    }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

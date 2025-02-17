@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, EmailStr
 from typing import Optional, List
 from datetime import datetime
 from bson import ObjectId
+from fastapi import UploadFile
 
 
 # User Model Start

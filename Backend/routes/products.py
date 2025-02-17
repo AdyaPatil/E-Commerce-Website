@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, status
 from db import products_collection, categories_collection
 from models import Product, ProductResponse, ProductUpdateRequest
 from typing import List
@@ -25,112 +25,183 @@ async def get_next_product_id():
 
 
 # Post request to add a new product
-@router.post("/products/", response_model=ProductResponse)
+@router.post("/products/", response_model=ProductResponse, status_code=status.HTTP_200_OK)
 async def add_product(product: Product, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "admin":
-        raise HTTPException(status_code=403, detail="Not authorized")
+    print("API endpoint hit!")  # Ensure this print statement is visible in your logs
 
-    # Get the next product_id by finding the maximum existing product_id
-    product_id = await get_next_product_id()
+    try:
+        if current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Not authorized")
 
-    # Convert ProductRequest model to dictionary for MongoDB insertion
-    new_product = product.dict(exclude_unset=True)
-    new_product["product_id"] = product_id  # Assign the custom product_id to the product
+        # Get the next product_id by finding the maximum existing product_id
+        product_id = await get_next_product_id()
 
-    # Insert the product into the MongoDB collection
-    result = await products_collection.insert_one(new_product)
+        print(f"Fetching category for category_id: {product.category_id}")
+        category = await categories_collection.find_one({"category_id": product.category_id})
+        print(f"Category found: {category}")  # Debug the fetched category
 
-    # Return the created product with the custom product_id
-    new_product["product_id"] = product_id  # Ensure product_id is part of the response
-    return ProductResponse(**new_product)
+        if category:
+            category_name = category.get("name", "Unknown Category")  # Use "name" instead of "category_name"
+        else:
+            category_name = "Unknown Category"  # Default value if category not found
+        
+        print(f"Fetched category_name: {category_name}")
+
+        # Construct the product data including category_name
+        new_product = {
+            "name": product.name,
+            "description": product.description,
+            "price": product.price,
+            "stock": product.stock,
+            "category_id": product.category_id,
+            "category_name": category_name,  # Ensure category_name is included
+            "image_url": product.image_url,
+            "product_id": product_id  # Add custom product_id to the product
+        }
+
+        print(f"New product data: {new_product}")
+
+        # Insert the product into the MongoDB collection
+        await products_collection.insert_one(new_product)
+
+        # Create and return the response with all necessary fields
+        response_product = ProductResponse(
+            product_id=str(new_product["product_id"]),
+            name=new_product["name"],
+            description=new_product["description"],
+            price=new_product["price"],
+            stock=new_product["stock"],
+            category_id=new_product["category_id"],
+            category_name=new_product["category_name"],
+            image_url=new_product["image_url"]
+        )
+
+        print(f"Response product: {response_product}")
+
+        return response_product
+
+    except Exception as e:
+        print(f"Error occurred: {e}")  # Log any errors
+        raise HTTPException(status_code=500, detail=str(e))
 
 
-# Get all products
-from fastapi import APIRouter, HTTPException
-from typing import List
-from pymongo import ASCENDING
 
 # Assuming you have a categories collection
-@router.get("/products/", response_model=List[ProductResponse])
+@router.get("/products/", response_model=List[ProductResponse], status_code=status.HTTP_200_OK)
 async def get_all_products():
-    products = await products_collection.find().to_list(100)  # Retrieve up to 100 products
-    
-    # Create a list to store the updated product data with category names
-    enriched_products = []
-    
-    for product in products:
-        # Fetch the category based on the category_id
-        category = await categories_collection.find_one({"category_id": product["category_id"]})
+    try:
+        products = await products_collection.find().to_list(100)  # Retrieve up to 100 products
         
-        if not category:
-            raise HTTPException(status_code=404, detail=f"Category not found for ID {product['category_id']}")
+        # Create a list to store the updated product data with category names
+        enriched_products = []
         
-        # Add the category name to the product data
-        product["category_name"] = category["name"]
-        enriched_products.append(ProductResponse(**product))
-    
-    return enriched_products
+        for product in products:
+            # Fetch the category based on the category_id
+            category = await categories_collection.find_one({"category_id": product["category_id"]})
+            
+            if not category:
+                raise HTTPException(status_code=404, detail=f"Category not found for ID {product['category_id']}")
+            
+            # Add the category name to the product data
+            product["category_name"] = category["name"]
+            enriched_products.append(ProductResponse(**product))
+            
+        
+        return enriched_products
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 # Get product details by product_id
-@router.get("/products/{product_id}", response_model=ProductResponse)
+@router.get("/products/{product_id}", response_model=ProductResponse, status_code=status.HTTP_200_OK)
 async def get_product_details(product_id: str):
-    # Query by 'product_id' field instead of '_id'
-    product = await products_collection.find_one({"product_id": product_id})
-    
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
-    
-    # Return the product details
-    return ProductResponse(**product)
+    try:
+        # Query by 'product_id' field instead of '_id'
+        product = await products_collection.find_one({"product_id": product_id})
+        
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
+        
+        # Return the product details
+        return ProductResponse(**product)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 # Update product details
-@router.put("/products/{product_id}", response_model=ProductResponse)
-async def update_product(product_id: str, product_update: ProductUpdateRequest, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "admin":
-        raise HTTPException(status_code=403, detail="Not authorized")
+@router.put("/products/{product_id}", response_model=ProductResponse, status_code=status.HTTP_200_OK)
+async def update_product(
+    product_id: str,
+    product_update: ProductUpdateRequest,
+    current_user: dict = Depends(get_current_user),
+):
+    try:
+        if current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Not authorized")
 
-    # Find the product by product_id (not by _id)
-    product = await products_collection.find_one({"product_id": product_id})
+        # Find the product by product_id (not by _id)
+        product = await products_collection.find_one({"product_id": product_id})
 
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
 
-    # Create a dictionary with only the updated fields (exclude unset fields)
-    update_fields = product_update.dict(exclude_unset=True)
+        # Create a dictionary with only the updated fields (exclude unset fields)
+        update_fields = product_update.dict(exclude_unset=True)
 
-    # If there are no fields to update, return the existing product
-    if not update_fields:
-        raise HTTPException(status_code=400, detail="No fields to update")
+        # If no fields are provided for update
+        if not update_fields:
+            raise HTTPException(status_code=400, detail="No fields to update")
 
-    # Update only the fields that are provided
-    await products_collection.update_one(
-        {"product_id": product_id},
-        {"$set": update_fields}
-    )
+        # If category_id is updated, fetch the category name
+        category_name = product.get("category_name", "")  # Default to existing category_name
 
-    # Fetch the updated product
-    updated_product = await products_collection.find_one({"product_id": product_id})
+        if "category_id" in update_fields:
+            category = await categories_collection.find_one({"category_id": update_fields["category_id"]})
+            if not category:
+                raise HTTPException(status_code=404, detail="Category not found")
+            category_name = category["name"]  # Fetch category name
 
-    return ProductResponse(**updated_product)
+            # Include category_name in update fields
+            update_fields["category_name"] = category_name
+
+        # Update only the fields that are provided
+        await products_collection.update_one(
+            {"product_id": product_id},
+            {"$set": update_fields}
+        )
+
+        # Fetch the updated product
+        updated_product = await products_collection.find_one({"product_id": product_id})
+
+        return ProductResponse(**updated_product)
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 
 
 # Delete a product by product_id
-@router.delete("/products/{product_id}", response_model=dict)
+@router.delete("/products/{product_id}", response_model=dict, status_code=status.HTTP_200_OK)
 async def delete_product(product_id: str, current_user: dict = Depends(get_current_user)):
-    if current_user["role"] != "admin":
-        raise HTTPException(status_code=403, detail="Not authorized")
+    try:
+        if current_user["role"] != "admin":
+            raise HTTPException(status_code=403, detail="Not authorized")
 
-    # Find the product by product_id (not by _id)
-    product = await products_collection.find_one({"product_id": product_id})
+        # Find the product by product_id (not by _id)
+        product = await products_collection.find_one({"product_id": product_id})
 
-    if not product:
-        raise HTTPException(status_code=404, detail="Product not found")
+        if not product:
+            raise HTTPException(status_code=404, detail="Product not found")
 
-    # Delete the product by product_id
-    await products_collection.delete_one({"product_id": product_id})
+        # Delete the product by product_id
+        await products_collection.delete_one({"product_id": product_id})
 
-    return {"message": "Product deleted successfully"}
+        return {"message": "Product deleted successfully"}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 

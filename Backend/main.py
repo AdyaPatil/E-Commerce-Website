@@ -9,6 +9,8 @@ from routes.payment import router as payment_routes
 from routes.review import router as review_routes
 from routes.admindashboard import router as admin_routes
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
+import json
 
 # Initialize the main FastAPI app
 app = FastAPI()
@@ -37,3 +39,8 @@ app.add_middleware(
 @app.get("/")
 def root():
     return {"message": "Welcome to the eCommerce API!"}
+
+
+# Main entry point
+if __name__ == "__main__":
+    uvicorn.run(app="main:app", host="127.0.0.1", port=8000, reload=True)
