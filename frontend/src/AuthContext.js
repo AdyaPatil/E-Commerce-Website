@@ -14,7 +14,7 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem("access_token");
       if (token) {
         try {
-          const response = await axios.get(`${Backend-url}/auth/me`, {
+          const response = await axios.get(`${Backend_url}/auth/me`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setUser(response.data.user);
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
   const logout = async () => {
     try {
       const token = localStorage.getItem("access_token");
-      await axios.post("http://127.0.0.1:8000/auth/logout", {}, {
+      await axios.post(`${Backend_url}/auth/logout`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
