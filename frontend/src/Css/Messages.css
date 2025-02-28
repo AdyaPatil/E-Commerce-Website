@@ -1,0 +1,45 @@
+.message-container {
+    margin-left: 300px;
+    padding: 20px;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .message-header{
+    margin-left: 900px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .search-bar {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 250px;
+  }
+  
+  .message-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .message-table th, .message-table td {
+    padding: 10px;
+    border: 1px solid #e7e6e6;
+    text-align: left;
+  }
+  
+  .message-table th {
+    background-color: #cfd8e2;
+    color: rgb(10, 10, 10);
+  }
+  
+  .message-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  

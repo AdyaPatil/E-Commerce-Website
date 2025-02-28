@@ -1,0 +1,35 @@
+.navbar-admin {
+  display: flex;
+  margin-left: 280px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.nav-icons {
+  display: flex;
+  align-items: center;
+}
+
+.bell-icon, .user-icon {
+  font-size: 1.5rem;
+  margin: 0 10px;
+  cursor: pointer;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-name {
+  margin-left: 1px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}

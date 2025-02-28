@@ -1,0 +1,19 @@
+/* Wishlist.css */
+.wishlist-page {
+    margin: auto;
+    max-width: 900px;
+  }
+  
+  .wishlist-items img {
+    border-radius: 8px;
+  }
+  
+  .table th, .table td {
+    vertical-align: middle;
+    text-align: center;
+  }
+  
+  .text-center h4 {
+    color: #555;
+  }
+  

@@ -1,0 +1,31 @@
+footer{
+  margin-top: 20px;
+}
+
+footer h5 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+footer p, footer a {
+  font-size: 0.9rem;
+}
+
+footer a {
+  color: #212529; /* Dark color for links */
+  transition: color 0.3s ease;
+}
+
+footer a:hover {
+  color: #17a2b8; /* Slight blue tint on hover */
+}
+
+footer .fab {
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
+}
+
+footer .fab:hover {
+  color: #17a2b8;
+}

@@ -1,0 +1,110 @@
+.add-product-container {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  .add-product-container h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .add-product-container form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .add-product-container input,select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  .add-product-container input,select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0px 0px 5px rgba(0, 123, 255, 0.5);
+  }
+  
+  .add-product-container input[type="file"] {
+    padding: 5px;
+    border: none;
+  }
+  
+  .add-product-container button {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .add-product-container button:hover {
+    background-color: #0056b3;
+  }
+  
+  .back-button {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .back-button:hover {
+    background-color: #5a6268;
+  }
+  .add-product-container {
+    width: 50%;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
+    text-align: center;
+  }
+  
+  .drop-zone {
+    margin: 10px 0;
+    padding: 20px;
+    border: 2px dashed #ccc;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .drop-zone p {
+    margin: 0;
+    color: #777;
+  }
+  
+  .drop-zone:hover {
+    border-color: #007bff;
+  }
+  
+  .drop-zone input {
+    display: none;
+  }
+  
+  .image-preview {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 5px;
+  }
+  
+  
