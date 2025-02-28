@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../../Css/Order.css";
+import {Backend_url} from  "../config.json"
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);

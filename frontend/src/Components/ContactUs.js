@@ -1,5 +1,6 @@
 import React from "react";
 import "../Css/ContactUs.css";
+import {Backend_url} from  "../config.json"
 
 const ContactUs = () => {
   return (

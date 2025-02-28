@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
+import {Backend_url} from  "../config.json"
 
 export const AuthContext = createContext();
 
@@ -13,7 +14,7 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem("access_token");
       if (token) {
         try {
-          const response = await axios.get("http://127.0.0.1:8000/auth/me", {
+          const response = await axios.get(`${Backend-url}/auth/me`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           setUser(response.data.user);

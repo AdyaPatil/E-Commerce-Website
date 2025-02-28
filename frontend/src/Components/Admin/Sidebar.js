@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "../../Css/Sidebar.css";
 import { FaHome, FaUser, FaShoppingCart, FaCog } from "react-icons/fa";
+import {Backend_url} from  "../config.json"
 
 
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Css/Wishlist.css";
+import {Backend_url} from  "../config.json"
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);

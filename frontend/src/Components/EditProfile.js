@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import indiaData from "../data/indiaData"; // Import the India data
 import "../Css/EditProfile.css";
+import {Backend_url} from  "../config.json"
 
 const EditProfile = () => {
   const [formData, setFormData] = useState({

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../../Css/Admin.css";
+import {Backend_url} from  "../config.json"
 
 const Dashboard = () => {
   const [analytics, setAnalytics] = useState({

@@ -4,6 +4,7 @@ import Cart from "./Cart";
 import "../Css/MainBody.css";
 import Bn1 from "../Asset/Bn1.jpg";
 import Bn2 from "../Asset/Bn2.webp";
+import {Backend_url} from  "../config.json"
 
 const bannerImages = [Bn1, Bn2];
 

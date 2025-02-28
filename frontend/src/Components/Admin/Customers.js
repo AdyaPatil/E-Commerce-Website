@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../../Css/Customer.css";
+import {Backend_url} from  "../config.json"
 
 const Customer = () => {
   const [customers, setCustomers] = useState([]);

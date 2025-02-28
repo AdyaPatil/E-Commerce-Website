@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios"; // Import Axios for API requests
 import "../../Css/Navbar.css";
 import { FaBell, FaUserCircle } from "react-icons/fa";
+import {Backend_url} from  "../config.json"
 
 const Navbar = () => {
   const [user, setUser] = useState({ firstName: "", lastName: "" });

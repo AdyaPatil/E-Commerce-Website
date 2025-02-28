@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../Css/Profile.css";
+import {Backend_url} from  "../config.json"
 
 const Profile = () => {
   const [user, setUser] = useState(null);

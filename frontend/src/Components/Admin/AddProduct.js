@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../Css/AddProduct.css";
+import {Backend_url} from  "../config.json"
 
 const AddProduct = () => {
   const navigate = useNavigate();

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../../Css/EditProduct.css";
+import {Backend_url} from  "../config.json"
 
 const EditProduct = ({ product, categories, closeEditPopup }) => {
   const token = localStorage.getItem("access_token");

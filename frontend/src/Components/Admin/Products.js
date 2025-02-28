@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../Css/Product.css";
 import EditProduct from "./EditProduct";
+import {Backend_url} from  "../config.json"
 
 const Product = ({ setActivePage }) => {
   const navigate = useNavigate();

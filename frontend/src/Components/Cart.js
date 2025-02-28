@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "../Css/Cart.css";
+import {Backend_url} from  "../config.json"
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
