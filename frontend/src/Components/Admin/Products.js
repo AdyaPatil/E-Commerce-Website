@@ -14,7 +14,7 @@ const Product = ({ setActivePage }) => {
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/products", {
+    fetch(`${Backend_url}/products`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -32,7 +32,7 @@ const Product = ({ setActivePage }) => {
       })
       .catch((error) => console.error("Error fetching products:", error));
 
-    fetch("http://127.0.0.1:8000/categories", {
+    fetch(`${Backend_url}/categories`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -59,7 +59,7 @@ const Product = ({ setActivePage }) => {
     if (!confirmDelete) return;
   
     try {
-      const response = await fetch(`http://127.0.0.1:8000/products/${productId}`, {
+      const response = await fetch(`${Backend_url}/products/${productId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

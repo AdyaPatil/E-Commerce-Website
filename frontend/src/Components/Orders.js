@@ -19,7 +19,7 @@ const Orders = () => {
             }
 
             try {
-                const response = await fetch(`http://127.0.0.1:8000/orders/user/${userId}`, {
+                const response = await fetch(`${Backend_url}/orders/user/${userId}`, {
                     headers: {
                         "Authorization": `Bearer ${token}`,
                         "Content-Type": "application/json"

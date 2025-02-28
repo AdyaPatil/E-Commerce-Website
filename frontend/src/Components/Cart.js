@@ -20,7 +20,7 @@ const Cart = () => {
         return;
       }
 
-      const response = await fetch("http://127.0.0.1:8000/cart/", {
+      const response = await fetch(`${Backend_url}/cart/`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -55,7 +55,7 @@ const Cart = () => {
         return;
       }
 
-      const response = await fetch(`http://127.0.0.1:8000/cart/update/${cart_id}`, {
+      const response = await fetch(`${Backend_url}/cart/update/${cart_id}`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -88,7 +88,7 @@ const Cart = () => {
         return;
       }
 
-      const response = await fetch(`http://127.0.0.1:8000/cart/remove/${cart_id}`, {
+      const response = await fetch(`${Backend_url}/cart/remove/${cart_id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,

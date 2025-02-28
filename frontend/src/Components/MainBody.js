@@ -25,7 +25,7 @@ const MainBody = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/products/");
+        const response = await fetch(`${Backend_url}/products/`);
         const data = await response.json();
         console.log("Fetched Products:", data); // Debugging
         setProducts(data);
@@ -49,7 +49,7 @@ const MainBody = () => {
       }
   
       // Fetch existing cart items
-      const cartResponse = await fetch("http://127.0.0.1:8000/cart", {
+      const cartResponse = await fetch(`${Backend_url}/cart`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -81,7 +81,7 @@ const MainBody = () => {
         created_date: new Date().toISOString(),
       };
   
-      const response = await fetch("http://127.0.0.1:8000/cart/add", {
+      const response = await fetch(`${Backend_url}/cart/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -20,10 +20,10 @@ const Orders = () => {
       if (!token) throw new Error("Missing authentication token.");
 
       const [ordersResponse, usersResponse] = await Promise.all([
-        axios.get("http://127.0.0.1:8000/admin/orders", {
+        axios.get(`${Backend_url}/admin/orders`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get("http://127.0.0.1:8000/users", {
+        axios.get(`${Backend_url}/users`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -52,7 +52,7 @@ const Orders = () => {
       const token = localStorage.getItem("access_token");
       if (!token) throw new Error("Missing authentication token.");
 
-      await axios.delete(`http://127.0.0.1:8000/orders/${order_id}`, {
+      await axios.delete(`${Backend_url}/orders/${order_id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -70,7 +70,7 @@ const Orders = () => {
       if (!token) throw new Error("Missing authentication token.");
 
       await axios.put(
-        `http://127.0.0.1:8000/orders/${order_id}/status`,
+        `${Backend_url}/orders/${order_id}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

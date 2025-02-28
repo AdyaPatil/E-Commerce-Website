@@ -68,7 +68,7 @@ const Checkout = () => {
       const token = localStorage.getItem("access_token");
       if (!token) return console.error("No access token found. Please log in.");
 
-      const response = await fetch(`http://127.0.0.1:8000/users/${storedUser}`, {
+      const response = await fetch(`${Backend_url}/users/${storedUser}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
@@ -96,7 +96,7 @@ const Checkout = () => {
       const token = localStorage.getItem("access_token");
       if (!token) return alert("Please log in to view your cart.");
 
-      const response = await fetch("http://127.0.0.1:8000/cart", {
+      const response = await fetch(`${Backend_url}/cart`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -165,7 +165,7 @@ const Checkout = () => {
   
       console.log("Order Data:", JSON.stringify(orderPayload, null, 2));
   
-      const response = await fetch(`http://127.0.0.1:8000/orders/`, {
+      const response = await fetch(`${Backend_url}/orders/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

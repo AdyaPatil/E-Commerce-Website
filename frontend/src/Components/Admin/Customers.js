@@ -19,7 +19,7 @@ const Customer = () => {
       const token = localStorage.getItem("access_token");
       if (!token) throw new Error("Missing authentication token.");
 
-      const response = await axios.get("http://127.0.0.1:8000/users/", {
+      const response = await axios.get("${Backend_url}/users/", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -43,7 +43,7 @@ const Customer = () => {
       const token = localStorage.getItem("access_token");
       if (!token) throw new Error("Missing authentication token.");
 
-      await axios.delete(`http://127.0.0.1:8000/users/${user_id}`, {
+      await axios.delete(`${Backend_url}/users/${user_id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

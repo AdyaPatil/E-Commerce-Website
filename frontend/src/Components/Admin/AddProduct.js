@@ -20,7 +20,7 @@ const AddProduct = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/categories/");
+        const response = await fetch(`${Backend_url}/categories/`);
         if (response.ok) {
           const data = await response.json();
           console.log("Fetched Categories:", data); // Debugging
@@ -85,7 +85,7 @@ const AddProduct = () => {
         imageData.append("file", formData.image);
 
         try {
-            const uploadResponse = await fetch("http://127.0.0.1:8000/upload/", {
+            const uploadResponse = await fetch(`${Backend_url}/upload/`, {
                 method: "POST",
                 body: imageData,
             });
@@ -105,7 +105,7 @@ const AddProduct = () => {
 
     // Send product data with image URL to backend
     try {
-        const response = await fetch("http://127.0.0.1:8000/products/", {
+        const response = await fetch(`${Backend_url}/products/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

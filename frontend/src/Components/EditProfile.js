@@ -33,7 +33,7 @@ const EditProfile = () => {
           return;
         }
 
-        const response = await axios.get(`http://127.0.0.1:8000/users/${user_id}`, {
+        const response = await axios.get(`${Backend_url}/users/${user_id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -84,7 +84,7 @@ const EditProfile = () => {
         return;
       }
 
-      await axios.put(`http://127.0.0.1:8000/users/${user_id}`, formData, {
+      await axios.put(`${Backend_url}/users/${user_id}`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

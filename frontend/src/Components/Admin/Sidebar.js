@@ -25,7 +25,7 @@ const Sidebar = ({ setActivePage }) => {
       }
 
       await axios.post(
-        "http://127.0.0.1:8000/auth/logout",
+        `${Backend_url}/auth/logout`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

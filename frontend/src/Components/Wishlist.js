@@ -19,7 +19,7 @@ const Wishlist = () => {
         const token = localStorage.getItem("access_token");
         if (!token) return;
 
-        const response = await fetch("http://127.0.0.1:8000/cart/", {
+        const response = await fetch(`${Backend_url}/cart/`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -66,7 +66,7 @@ const Wishlist = () => {
         created_date: new Date().toISOString(),
       };
 
-      const response = await fetch("http://127.0.0.1:8000/cart/add", {
+      const response = await fetch(`${Backend_url}/cart/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

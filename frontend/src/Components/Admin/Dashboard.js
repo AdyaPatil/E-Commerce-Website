@@ -13,7 +13,7 @@ const Dashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("access_token"); // Retrieve token from localStorage
 
-    fetch("http://127.0.0.1:8000/admin/analytics", {
+    fetch(`${Backend_url}/admin/analytics`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

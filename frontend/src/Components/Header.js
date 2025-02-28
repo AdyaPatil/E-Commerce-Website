@@ -64,7 +64,7 @@ const Header = () => {
 
     try {
         const response = await axios.post(
-            "http://127.0.0.1:8000/auth/login",
+            `${Backend_url}/auth/login`,
             { email, password },
             { headers: { "Content-Type": "application/json" } }
         );
@@ -107,7 +107,7 @@ const Header = () => {
       }
 
       await axios.post(
-        "http://127.0.0.1:8000/auth/logout",
+        `${Backend_url}/auth/logout`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
