@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../Css/Profile.css";
-import {Backend_url} from  "../config.json"
+//import {Backend_url} from  "../../Config/config.json";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -19,7 +19,7 @@ const Profile = () => {
           return;
         }
 
-        const response = await axios.get(`${Backend_url}/users/${user_id}`, {
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/users/${user_id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

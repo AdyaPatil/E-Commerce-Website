@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import "../Css/Cart.css";
-import {Backend_url} from  "../config.json"
+//import {Backend_url} from  "../../Config/config.json";
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -20,7 +20,7 @@ const Cart = () => {
         return;
       }
 
-      const response = await fetch(`${Backend_url}/cart/`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/cart/`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -55,7 +55,7 @@ const Cart = () => {
         return;
       }
 
-      const response = await fetch(`${Backend_url}/cart/update/${cart_id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/cart/update/${cart_id}`, {
         method: "PUT",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -88,7 +88,7 @@ const Cart = () => {
         return;
       }
 
-      const response = await fetch(`${Backend_url}/cart/remove/${cart_id}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/cart/remove/${cart_id}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,

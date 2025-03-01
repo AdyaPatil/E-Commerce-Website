@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../Css/AddProduct.css";
-import {Backend_url} from  "../config.json"
+//import {Backend_url} from  "../../../config.json"
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const AddProduct = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`${Backend_url}/categories/`);
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/categories/`);
         if (response.ok) {
           const data = await response.json();
           console.log("Fetched Categories:", data); // Debugging
@@ -85,7 +85,7 @@ const AddProduct = () => {
         imageData.append("file", formData.image);
 
         try {
-            const uploadResponse = await fetch(`${Backend_url}/upload/`, {
+            const uploadResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/upload/`, {
                 method: "POST",
                 body: imageData,
             });
@@ -105,7 +105,7 @@ const AddProduct = () => {
 
     // Send product data with image URL to backend
     try {
-        const response = await fetch(`${Backend_url}/products/`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/products/`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

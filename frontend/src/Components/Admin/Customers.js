@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../../Css/Customer.css";
-import {Backend_url} from  "../config.json"
+//import {Backend_url} from  "../../../config.json"
 
 const Customer = () => {
   const [customers, setCustomers] = useState([]);
@@ -19,7 +19,7 @@ const Customer = () => {
       const token = localStorage.getItem("access_token");
       if (!token) throw new Error("Missing authentication token.");
 
-      const response = await axios.get("${Backend_url}/users/", {
+      const response = await axios.get("${process.env.REACT_APP_BACKEND_URL}/users/", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -43,7 +43,7 @@ const Customer = () => {
       const token = localStorage.getItem("access_token");
       if (!token) throw new Error("Missing authentication token.");
 
-      await axios.delete(`${Backend_url}/users/${user_id}`, {
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/users/${user_id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

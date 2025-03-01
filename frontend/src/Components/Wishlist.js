@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "../Css/Wishlist.css";
-import {Backend_url} from  "../config.json"
+//import {Backend_url} from  "../../Config/config.json";
 
 const Wishlist = () => {
   const [wishlist, setWishlist] = useState([]);
@@ -19,7 +19,7 @@ const Wishlist = () => {
         const token = localStorage.getItem("access_token");
         if (!token) return;
 
-        const response = await fetch(`${Backend_url}/cart/`, {
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/cart/`, {
           method: "GET",
           headers: {
             "Authorization": `Bearer ${token}`,
@@ -66,7 +66,7 @@ const Wishlist = () => {
         created_date: new Date().toISOString(),
       };
 
-      const response = await fetch(`${Backend_url}/cart/add`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/cart/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

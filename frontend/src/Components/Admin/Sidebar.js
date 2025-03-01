@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "../../Css/Sidebar.css";
 import { FaHome, FaUser, FaShoppingCart, FaCog } from "react-icons/fa";
-import {Backend_url} from  "../config.json"
+//import {Backend_url} from  "../../../config.json"
 
 
 
@@ -25,7 +25,7 @@ const Sidebar = ({ setActivePage }) => {
       }
 
       await axios.post(
-        `${Backend_url}/auth/logout`,
+        `${process.env.REACT_APP_BACKEND_URL}/auth/logout`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

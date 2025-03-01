@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../../Css/Product.css";
 import EditProduct from "./EditProduct";
-import {Backend_url} from  "../config.json"
+//import {Backend_url} from  "../../../config.json"
 
 const Product = ({ setActivePage }) => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const Product = ({ setActivePage }) => {
   const token = localStorage.getItem("access_token");
 
   useEffect(() => {
-    fetch(`${Backend_url}/products`, {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/products`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -32,7 +32,7 @@ const Product = ({ setActivePage }) => {
       })
       .catch((error) => console.error("Error fetching products:", error));
 
-    fetch(`${Backend_url}/categories`, {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/categories`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -59,7 +59,7 @@ const Product = ({ setActivePage }) => {
     if (!confirmDelete) return;
   
     try {
-      const response = await fetch(`${Backend_url}/products/${productId}`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/products/${productId}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

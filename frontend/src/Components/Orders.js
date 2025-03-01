@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../Css/Orders.css";
-import {Backend_url} from  "../config.json"
+//import {Backend_url} from  "../../Config/config.json";
 
 const Orders = () => {
     const [orders, setOrders] = useState([]);
@@ -19,7 +19,7 @@ const Orders = () => {
             }
 
             try {
-                const response = await fetch(`${Backend_url}/orders/user/${userId}`, {
+                const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/orders/user/${userId}`, {
                     headers: {
                         "Authorization": `Bearer ${token}`,
                         "Content-Type": "application/json"

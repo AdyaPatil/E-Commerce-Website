@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "../../Css/Admin.css";
-import {Backend_url} from  "../config.json"
+//import {Backend_url} from  "../../../config.json"
 
 const Dashboard = () => {
   const [analytics, setAnalytics] = useState({
@@ -13,7 +13,7 @@ const Dashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("access_token"); // Retrieve token from localStorage
 
-    fetch(`${Backend_url}/admin/analytics`, {
+    fetch(`${process.env.REACT_APP_BACKEND_URL}/admin/analytics`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

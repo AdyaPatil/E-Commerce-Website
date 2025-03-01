@@ -4,7 +4,7 @@ import Cart from "./Cart";
 import "../Css/MainBody.css";
 import Bn1 from "../Asset/Bn1.jpg";
 import Bn2 from "../Asset/Bn2.webp";
-import {Backend_url} from  "../config.json"
+//import {Backend_url} from  "../../Config/config.json";
 
 const bannerImages = [Bn1, Bn2];
 
@@ -25,7 +25,7 @@ const MainBody = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch(`${Backend_url}/products/`);
+        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/products/`);
         const data = await response.json();
         console.log("Fetched Products:", data); // Debugging
         setProducts(data);
@@ -49,7 +49,7 @@ const MainBody = () => {
       }
   
       // Fetch existing cart items
-      const cartResponse = await fetch(`${Backend_url}/cart`, {
+      const cartResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/cart`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -81,7 +81,7 @@ const MainBody = () => {
         created_date: new Date().toISOString(),
       };
   
-      const response = await fetch(`${Backend_url}/cart/add`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/cart/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

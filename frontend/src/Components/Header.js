@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import "../Css/Header.css";
-import {Backend_url} from  "../config.json"
+//import {Backend_url} from  "../../Config/config.json";
 
 const Header = () => {
   const [showLogin, setShowLogin] = useState(false);
@@ -64,7 +64,7 @@ const Header = () => {
 
     try {
         const response = await axios.post(
-            `${Backend_url}/auth/login`,
+            `${process.env.REACT_APP_BACKEND_URL}/auth/login`,
             { email, password },
             { headers: { "Content-Type": "application/json" } }
         );
@@ -107,7 +107,7 @@ const Header = () => {
       }
 
       await axios.post(
-        `${Backend_url}/auth/logout`,
+        `${process.env.REACT_APP_BACKEND_URL}/auth/logout`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

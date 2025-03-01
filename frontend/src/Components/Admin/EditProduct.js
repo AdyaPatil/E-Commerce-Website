@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "../../Css/EditProduct.css";
-import {Backend_url} from  "../config.json"
+//import {Backend_url} from  "../../../config.json"
 
 const EditProduct = ({ product, categories, closeEditPopup }) => {
   const token = localStorage.getItem("access_token");
@@ -65,7 +65,7 @@ const EditProduct = ({ product, categories, closeEditPopup }) => {
         imageData.append("file", formData.image);
 
         try {
-            const uploadResponse = await fetch(`${Backend_url}/upload/`, {
+            const uploadResponse = await fetch(`${process.env.REACT_APP_BACKEND_URL}/upload/`, {
                 method: "POST",
                 body: imageData,
             });
@@ -95,7 +95,7 @@ const EditProduct = ({ product, categories, closeEditPopup }) => {
 
     try {
         const response = await fetch(
-            `${Backend_url}/products/${product.product_id}`,
+            `${process.env.REACT_APP_BACKEND_URL}/products/${product.product_id}`,
             {
                 method: "PUT",
                 headers: {

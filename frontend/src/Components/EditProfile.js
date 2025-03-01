@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import indiaData from "../data/indiaData"; // Import the India data
 import "../Css/EditProfile.css";
-import {Backend_url} from  "../config.json"
+//import {Backend_url} from  "../../Config/config.json";
 
 const EditProfile = () => {
   const [formData, setFormData] = useState({
@@ -33,7 +33,7 @@ const EditProfile = () => {
           return;
         }
 
-        const response = await axios.get(`${Backend_url}/users/${user_id}`, {
+        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/users/${user_id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -84,7 +84,7 @@ const EditProfile = () => {
         return;
       }
 
-      await axios.put(`${Backend_url}/users/${user_id}`, formData, {
+      await axios.put(`${process.env.REACT_APP_BACKEND_URL}/users/${user_id}`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

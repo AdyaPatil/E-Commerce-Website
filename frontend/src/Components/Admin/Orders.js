@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "../../Css/Order.css";
-import {Backend_url} from  "../config.json"
+//import {Backend_url} from  "../../../config.json"
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -20,10 +20,10 @@ const Orders = () => {
       if (!token) throw new Error("Missing authentication token.");
 
       const [ordersResponse, usersResponse] = await Promise.all([
-        axios.get(`${Backend_url}/admin/orders`, {
+        axios.get(`${process.env.REACT_APP_BACKEND_URL}/admin/orders`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get(`${Backend_url}/users`, {
+        axios.get(`${process.env.REACT_APP_BACKEND_URL}/users`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -52,7 +52,7 @@ const Orders = () => {
       const token = localStorage.getItem("access_token");
       if (!token) throw new Error("Missing authentication token.");
 
-      await axios.delete(`${Backend_url}/orders/${order_id}`, {
+      await axios.delete(`${process.env.REACT_APP_BACKEND_URL}/orders/${order_id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -70,7 +70,7 @@ const Orders = () => {
       if (!token) throw new Error("Missing authentication token.");
 
       await axios.put(
-        `${Backend_url}/orders/${order_id}/status`,
+        `${process.env.REACT_APP_BACKEND_URL}/orders/${order_id}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
