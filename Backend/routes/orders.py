@@ -90,7 +90,6 @@ def _sanitize_order_data(order: dict) -> dict:
     return order
 
 
-
 class UpdateOrderStatusRequest(BaseModel):
     status: str
 
@@ -100,17 +99,35 @@ async def update_order_status(order_id: str, update_request: UpdateOrderStatusRe
         if current_user["role"] != "admin":
             raise HTTPException(status_code=403, detail="Only admins can update order status")
 
+        # Ensure order_id is a string (not ObjectId)
         order = await orders_collection.find_one({"order_id": order_id})
         if not order:
             raise HTTPException(status_code=404, detail="Order not found")
 
+        # Update the order status and timestamp
         await orders_collection.update_one(
             {"order_id": order_id},
             {"$set": {"status": update_request.status, "updated_date": datetime.utcnow()}}
         )
 
+        # Fetch the updated order
         updated_order = await orders_collection.find_one({"order_id": order_id})
+        if not updated_order:
+            raise HTTPException(status_code=404, detail="Failed to retrieve updated order")
+
+        # Fix potential validation issues in the response
+        if "shipping_address" in updated_order:
+            shipping_address = updated_order["shipping_address"]
+            shipping_address["full_name"] = shipping_address.pop("name", shipping_address.get("full_name", ""))
+            shipping_address["pincode"] = str(shipping_address["pincode"])  # Convert pincode to string
+
+        if "billing_details" in updated_order:
+            billing_details = updated_order["billing_details"]
+            billing_details["full_name"] = billing_details.pop("name", billing_details.get("full_name", ""))
+            billing_details["pincode"] = str(billing_details["pincode"])  # Convert pincode to string
+
         return OrderResponse(**updated_order)
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 

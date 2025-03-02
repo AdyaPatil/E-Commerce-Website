@@ -19,7 +19,7 @@ const Customer = () => {
       const token = localStorage.getItem("access_token");
       if (!token) throw new Error("Missing authentication token.");
 
-      const response = await axios.get("${process.env.REACT_APP_BACKEND_URL}/users/", {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/users/`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

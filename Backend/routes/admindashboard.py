@@ -44,11 +44,32 @@ async def get_all_orders(current_user: dict = Depends(get_current_user)):
         if str(current_user["role"]) != "admin":
             raise HTTPException(status_code=403, detail="Access forbidden")
 
-        # Fetch all orders
+        # Fetch all orders from MongoDB
         orders = await orders_collection.find().to_list(100)
-        return [OrderResponse(**order) for order in orders]
+
+        # Transform data to match Pydantic model
+        transformed_orders = []
+        for order in orders:
+            if "shipping_address" in order:
+                # Ensure 'full_name' exists and convert 'pincode' to string
+                shipping_address = order["shipping_address"]
+                shipping_address["full_name"] = shipping_address.pop("name", "")
+                shipping_address["pincode"] = str(shipping_address["pincode"])
+
+            if "billing_details" in order:
+                # Ensure 'full_name' exists and convert 'pincode' to string
+                billing_details = order["billing_details"]
+                billing_details["full_name"] = billing_details.pop("name", "")
+                billing_details["pincode"] = str(billing_details["pincode"])
+
+            # Create a valid OrderResponse
+            transformed_orders.append(OrderResponse(**order))
+
+        return transformed_orders
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve orders: {str(e)}")
+
 
 @router.get("/admin/users", response_model=List[UserProfile], status_code=status.HTTP_200_OK)
 async def get_all_users(current_user: dict = Depends(get_current_user)):
