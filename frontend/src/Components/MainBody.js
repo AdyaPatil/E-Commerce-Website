@@ -25,6 +25,7 @@ const MainBody = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+	console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
         const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/products/`);
         const data = await response.json();
         console.log("Fetched Products:", data); // Debugging

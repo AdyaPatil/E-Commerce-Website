@@ -1,0 +1,30 @@
+version: "3.8"
+
+networks:
+  ecommerce_network:
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
+
+services:
+  backend:  # ✅ Fixed indentation
+    container_name: backend
+    build: ./Backend
+    ports:
+      - "8000:8000"
+    networks:
+      ecommerce_network:
+        ipv4_address: 192.168.1.100
+
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    ports:
+      - "3600:3600"
+    depends_on:
+      - backend
+    env_file:
+      - ./frontend/.env  # ✅ Ensure .env file is included
+    networks:
+      ecommerce_network:
+
