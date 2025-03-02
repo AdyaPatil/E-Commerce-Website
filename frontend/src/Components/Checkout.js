@@ -16,7 +16,7 @@ const Checkout = () => {
     walletProvider: "",
   });
   const [billingDetails, setBillingDetails] = useState({
-    name: "",
+    full_name: "",  // Renamed from name
     email: "",
     address: "",
     state: "",
@@ -26,7 +26,7 @@ const Checkout = () => {
     pincode: "",
   });
   const [shippingAddress, setShippingAddress] = useState({
-    name: "",
+    full_name: "",  // Renamed from name
     email: "",
     address: "",
     state: "",
@@ -64,32 +64,33 @@ const Checkout = () => {
     try {
       const storedUser = JSON.parse(localStorage.getItem("user_id"));
       if (!storedUser) return console.error("User ID not found in localStorage.");
-
+  
       const token = localStorage.getItem("access_token");
       if (!token) return console.error("No access token found. Please log in.");
-
+  
       const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users/${storedUser}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
-
+  
       if (!response.ok) throw new Error("Failed to fetch user details.");
-
+  
       const userData = await response.json();
       setBillingDetails({
-        name: `${userData.first_name || ""} ${userData.last_name || ""}`.trim(),
+        full_name: `${userData.first_name || ""} ${userData.last_name || ""}`.trim(), // Updated
         email: userData.email || "",
         address: userData.address || "",
         state: userData.state || "",
         district: userData.district || "",
         taluka: userData.taluka || "",
         village: userData.village || "",
-        pincode: userData.pincode || "",
+        pincode: String(userData.pincode || ""), // Ensure pincode is a string
       });
     } catch (error) {
       console.error("Error fetching user details:", error);
     }
   };
+  
 
   const fetchCart = async () => {
     try {
@@ -116,9 +117,7 @@ const Checkout = () => {
 
   const handlePaymentSelection = (method) => {
     setSelectedPayment(method);
-  
     if (method === "cod") {
-      // Clear payment details if COD is selected
       setPaymentDetails({
         cardName: "",
         cardNumber: "",
@@ -129,7 +128,6 @@ const Checkout = () => {
       });
     }
   };
-  
 
   const handlePaymentInputChange = (e) => {
     const { name, value } = e.target;
@@ -137,7 +135,7 @@ const Checkout = () => {
   };
 
   const handlePlaceOrder = async () => {
-    if (!billingDetails.name || !shippingAddress.address) {
+    if (!billingDetails.full_name || !shippingAddress.address) {
       alert("Please fill in all required details before placing the order.");
       return;
     }
@@ -148,7 +146,7 @@ const Checkout = () => {
         alert("Please log in to place an order.");
         return;
       }
-      const user_id = localStorage.getItem("user_id");
+  
       const orderPayload = {
         items: cart.map((item) => ({
           product_id: item.product_id,
@@ -157,10 +155,10 @@ const Checkout = () => {
           quantity: item.quantity,
         })),
         total_amount: calculateTotal(),
-        billing_details: billingDetails,
-        shipping_address: shippingAddress,
+        billing_details: { ...billingDetails, pincode: String(billingDetails.pincode) }, // Ensure pincode is a string
+        shipping_address: { ...shippingAddress, pincode: String(shippingAddress.pincode) },
         payment_method: selectedPayment,
-        payment_details: selectedPayment === "cod" ? null : paymentDetails, // Set null for COD
+        payment_details: selectedPayment === "cod" ? { cardName: "", cardNumber: "", expiryDate: "", cvv: "", upiId: "", walletProvider: "" } : paymentDetails,
       };
   
       console.log("Order Data:", JSON.stringify(orderPayload, null, 2));

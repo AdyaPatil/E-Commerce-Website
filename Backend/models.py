@@ -110,30 +110,30 @@ class Order(BaseModel):
     price: float
     quantity: int
 
-
 class BillingDetails(BaseModel):
-    full_name: str
+    full_name: str  # Changed from 'name' to 'full_name'
     email: str
     address: str
     state: str
     district: str
     taluka: str
     village: str
-    pincode: str
+    pincode: str  # Changed from int to str
 
 class OrderRequest(BaseModel):
-    items: List[Order]  # List of items in the order
-    total_amount: float  # Total price for the order
-    shipping_address: str  # Address where the order should be delivered
-    billing_details: BillingDetails  # Billing details of the user
-
+    items: List[Order]
+    total_amount: float
+    shipping_address: BillingDetails  # Changed from 'str' to 'BillingDetails'
+    billing_details: BillingDetails
+    payment_method: str
+    payment_details: Optional[dict] = None  # Made it optional
 
 class OrderResponse(BaseModel):
     order_id: str
     user_id: str
     items: List[Order]
     total_amount: float
-    shipping_address: str
+    shipping_address: BillingDetails
     status: str
     created_date: datetime
     updated_date: Optional[datetime] = None
