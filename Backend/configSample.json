@@ -1,0 +1,12 @@
+
+
+{
+    "MONGO_DB_URL" : "",
+    "DATABASE_NAME" : "",
+    "cloud_name": "",
+    "access_key": "",
+    "secret_key": "",
+    "region" : "",
+    "bucket_name": ""
+    }
+
