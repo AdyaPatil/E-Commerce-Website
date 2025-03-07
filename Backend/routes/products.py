@@ -5,6 +5,7 @@ from typing import List
 from .auth import get_current_user  # Assuming the authentication route is implemented elsewhere
 import boto3
 import os
+import json
 
 
 router = APIRouter()
@@ -26,13 +27,24 @@ async def get_next_product_id():
         return "1"  # Ensure it is returned as a string
 
 
-s3_client = boto3.client(
-    "s3",
-    aws_access_key_id=os.getenv("AKIAQUFLQGAZUGO4UYX7"),
-    aws_secret_access_key=os.getenv("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"),
-    region_name="eu-north-1"
-)
-BUCKET_NAME = "product-images-adinath-2025"
+# Load configuration from JSON file
+try:
+    with open("config.json", "r") as config_file:
+        config = json.load(config_file)
+    
+    # Initialize S3 client using config values
+    s3_client = boto3.client(
+        "s3",
+        aws_access_key_id=config["access_key"],
+        aws_secret_access_key=config["secret_key"],
+        region_name=config["region"]
+    )
+
+    BUCKET_NAME = config["bucket_name"]
+
+except Exception as e:
+    print(f"Error loading configuration: {e}")
+
 
 
 @router.post("/upload/")
