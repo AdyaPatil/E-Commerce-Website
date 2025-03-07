@@ -1,8 +1,10 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, UploadFile, File
 from db import products_collection, categories_collection
 from models import Product, ProductResponse, ProductUpdateRequest
 from typing import List
 from .auth import get_current_user  # Assuming the authentication route is implemented elsewhere
+import boto3
+import os
 
 
 router = APIRouter()
@@ -23,6 +25,27 @@ async def get_next_product_id():
         # Return "1" as the starting product_id if no valid product_id is found
         return "1"  # Ensure it is returned as a string
 
+
+s3_client = boto3.client(
+    "s3",
+    aws_access_key_id=os.getenv("AKIAQUFLQGAZUGO4UYX7"),
+    aws_secret_access_key=os.getenv("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"),
+    region_name="eu-north-1"
+)
+BUCKET_NAME = "product-images-adinath-2025"
+
+
+@router.post("/upload/")
+async def upload_image(file: UploadFile = File(...)):
+    try:
+        file_key = f"products/{file.filename}"  # Define file path in S3
+        s3_client.upload_fileobj(file.file, BUCKET_NAME, file_key)  # ❌ Remove ACL
+
+        image_url = f"https://{BUCKET_NAME}.s3.amazonaws.com/{file_key}"
+        return {"image_url": image_url}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Post request to add a new product
 @router.post("/products/", response_model=ProductResponse, status_code=status.HTTP_200_OK)

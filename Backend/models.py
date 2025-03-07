@@ -88,7 +88,8 @@ class Product(BaseModel):
     price: float
     stock: int
     category_id: str
-    image_url: Optional[str] = None
+    image_url: Optional[str] = None  # ✅ This is correct
+
 
 
 class ProductUpdateRequest(BaseModel):
