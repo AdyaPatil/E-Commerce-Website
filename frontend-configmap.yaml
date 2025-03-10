@@ -1,7 +1,1 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: frontend-config
-data:
-  REACT_APP_BACKEND_URL: "http://a51512be073044b08b8438dfe82bdf4f-1662190320.ap-south-1.elb.amazonaws.com:8000"
 
