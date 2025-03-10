@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+spec:
+  replicas: 2  # Number of backend pods
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: adi2634/backend-python:latest  # Replace with your actual image
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: backend-config  # Refers to the ConfigMap for env variables
+
