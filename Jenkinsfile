@@ -1,0 +1,77 @@
+pipeline {
+    agent any
+    environment {
+        AWS_REGION = "ap-south-1"  // AWS region
+        CLUSTER_NAME = "EcomEKSCluster" // EKS cluster name
+    }
+    stages {
+        stage('Clean Previous Workspace') {
+            steps {
+                cleanWs() // Clean workspace before running
+            }
+        }
+
+        stage('Checkout Code') {
+            steps {
+                git branch: 'main', url: 'https://github.com/AdyaPatil/E-Commerce-Website.git'
+            }
+        }
+
+        stage('Login to Docker Hub') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASS')]) {
+                        sh "echo \$DOCKER_HUB_PASS | docker login -u \$DOCKER_HUB_USER --password-stdin"
+                    }
+                }
+            }
+        }
+
+        stage('Build and Push Images') {
+            steps {
+                script {
+                    sh """
+                    docker build -t adi2634/frontend:latest -f frontend/Dockerfile frontend
+                    docker build -t adi2634/backend:latest -f Backend/Dockerfile Backend
+                    docker push adi2634/frontend:latest
+                    docker push adi2634/backend:latest
+                    """
+                }
+            }
+        }
+
+        stage('Authenticate with Kubernetes') {
+            steps {
+                script {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '340752823814', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                        sh """
+                        export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+                        export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+                        export AWS_DEFAULT_REGION=${AWS_REGION}
+                        
+                        aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
+                        aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
+                        aws configure set region ${AWS_REGION}
+
+                        aws eks update-kubeconfig --name ${CLUSTER_NAME} --region ${AWS_REGION}
+                        kubectl config current-context
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    sh """
+                    kubectl apply -f frontend-deployment.yaml 
+                    kubectl apply -f backend-deployment.yaml 
+                    kubectl apply -f frontend-service.yaml 
+                    kubectl apply -f backend-service.yaml 
+                    """
+                }
+            }
+        }
+    }
+}
