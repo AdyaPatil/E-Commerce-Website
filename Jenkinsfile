@@ -31,10 +31,10 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker build -t adi2634/frontend:latest -f frontend/Dockerfile frontend
-                    docker build -t adi2634/backend:latest -f Backend/Dockerfile Backend
-                    docker push adi2634/frontend:latest
-                    docker push adi2634/backend:latest
+                    docker build -t adi2634/frontend-react:latest -f frontend/Dockerfile frontend
+                    docker build -t adi2634/backend-python:latest -f Backend/Dockerfile Backend
+                    docker push adi2634/frontend-react:latest
+                    docker push adi2634/backend-python:latest
                     """
                 }
             }
