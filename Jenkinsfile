@@ -17,6 +17,25 @@ pipeline {
             }
         }
 
+        stage('Retrieve config.json from Jenkins Secrets') {
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'CONFIG_JSON', variable: 'CONFIG_JSON_CONTENT')]) {
+                        sh '''
+                        # Save the Jenkins secret to config.json
+                        echo "$CONFIG_JSON_CONTENT" > config.json
+
+                        # Create a Kubernetes secret from config.json
+                        kubectl create secret generic config-secret --from-file=config.json --dry-run=client -o yaml | kubectl apply -f -
+
+                        # Cleanup: Remove config.json after creating the secret
+                        rm -f config.json
+                        '''
+                    }
+                }
+            }
+        }
+
         stage('Login to Docker Hub') {
             steps {
                 script {
