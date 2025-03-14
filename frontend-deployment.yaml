@@ -14,13 +14,12 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: adi2634/frontend-react:latest
+          image: adi2634/image:front
           ports:
-            - containerPort: 3600  # ✅  Should match the service targetPort
+            - containerPort: 3600
           env:
             - name: REACT_APP_BACKEND_URL
               valueFrom:
                 configMapKeyRef:
-                  name: frontend-config  # ✅ Using ConfigMap
+                  name: frontend-config
                   key: REACT_APP_BACKEND_URL
-
