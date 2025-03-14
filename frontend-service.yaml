@@ -8,6 +8,5 @@ spec:
     app: frontend
   ports:
     - protocol: TCP
-      port: 80          # External port (browser)
+      port: 3600          # External port (browser)
       targetPort: 3600  # Must match container's running port
-
