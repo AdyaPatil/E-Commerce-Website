@@ -3,4 +3,4 @@ kind: ConfigMap
 metadata:
   name: frontend-config
 data:
-  REACT_APP_BACKEND_URL: "http://a8639f6449dab4c71bed7e794cdebf9a-1961119967.ap-south-1.elb.amazonaws.com"
+  REACT_APP_BACKEND_URL: "http://a340b14a8feab4845b86c3ca6541df76-438190036.ap-south-1.elb.amazonaws.com"
