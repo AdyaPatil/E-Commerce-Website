@@ -84,7 +84,9 @@ pipeline {
             steps {
                 script {
                     sh """
-                    kubectl apply -f frontend-deployment.yaml 
+                    kubectl apply -f frontend-config.yaml
+                    kubectl apply -f frontend-deployment.yaml
+                    kubectl rollout restart deployment frontend-deployment
                     kubectl apply -f backend-deployment.yaml 
                     kubectl apply -f frontend-service.yaml 
                     kubectl apply -f backend-service.yaml 
