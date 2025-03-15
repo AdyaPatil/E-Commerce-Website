@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: ecommerce-config
 data:
-  DATABASE_URL: "" 
-  SECRET_KEY: "your-secret-key"
-  JWT_EXPIRATION: "3600"  
-  FRONTEND_URL: "http://frontend-service:3600"  
+  DATABASE_URL: "PLACEHOLDER_DB_URL"
+  SECRET_KEY: "PLACEHOLDER_SECRET_KEY"
+  JWT_EXPIRATION: "PLACEHOLDER_JWT_EXPIRATION"
+  FRONTEND_URL: "http://frontend-service:3600"
