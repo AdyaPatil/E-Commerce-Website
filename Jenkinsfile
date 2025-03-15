@@ -1,13 +1,13 @@
 pipeline {
     agent any
     environment {
-        AWS_REGION = "ap-south-1"  // AWS region
-        CLUSTER_NAME = "EcomEKSCluster" // EKS cluster name
+        AWS_REGION = "ap-south-1" 
+        CLUSTER_NAME = "EcomEKSCluster"
     }
     stages {
         stage('Clean Previous Workspace') {
             steps {
-                cleanWs() // Clean workspace before running
+                cleanWs()
             }
         }
 
@@ -17,19 +17,22 @@ pipeline {
             }
         }
 
-        stage('Retrieve config.json from Jenkins Secrets') {
+        stage('Secure ConfigMap Update') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'CONFIG_JSON', variable: 'CONFIG_JSON_CONTENT')]) {
+                    withCredentials([
+                        string(credentialsId: 'DB_URL', variable: 'DB_URL'),
+                        string(credentialsId: 'SECRET_KEY', variable: 'SECRET_KEY'),
+                        string(credentialsId: 'JWT_EXPIRATION', variable: 'JWT_EXPIRATION')
+                    ]) {
                         sh '''
-                        # Save the Jenkins secret to config.json
-                        echo "$CONFIG_JSON_CONTENT" > config.json
+                        # Update ecommerce-config.yaml with sensitive data
+                        sed -i "s|PLACEHOLDER_DB_URL|$DB_URL|g" Backend/ecommerce-config.yaml
+                        sed -i "s|PLACEHOLDER_SECRET_KEY|$SECRET_KEY|g" Backend/ecommerce-config.yaml
+                        sed -i "s|PLACEHOLDER_JWT_EXPIRATION|$JWT_EXPIRATION|g" Backend/ecommerce-config.yaml
 
-                        # Create a Kubernetes secret from config.json
-                        kubectl create secret generic config-secret --from-file=config.json --dry-run=client -o yaml | kubectl apply -f -
-
-                        # Cleanup: Remove config.json after creating the secret
-                        rm -f config.json
+                        # Apply the updated config to Kubernetes
+                        kubectl apply -f Backend/ecommerce-config.yaml
                         '''
                     }
                 }
@@ -62,12 +65,13 @@ pipeline {
         stage('Authenticate with Kubernetes') {
             steps {
                 script {
-                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '340752823814', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                    withCredentials([[
+                        $class: 'AmazonWebServicesCredentialsBinding',
+                        credentialsId: '340752823814',
+                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                    ]]) {
                         sh """
-                        export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-                        export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-                        export AWS_DEFAULT_REGION=${AWS_REGION}
-                        
                         aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
                         aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
                         aws configure set region ${AWS_REGION}
@@ -84,10 +88,10 @@ pipeline {
             steps {
                 script {
                     sh """
-                    kubectl apply -f frontend-deployment.yaml 
-                    kubectl apply -f backend-deployment.yaml 
-                    kubectl apply -f frontend-service.yaml 
-                    kubectl apply -f backend-service.yaml 
+                    kubectl apply -f frontend-deployment.yaml
+                    kubectl apply -f backend-deployment.yaml
+                    kubectl apply -f frontend-service.yaml
+                    kubectl apply -f backend-service.yaml
                     """
                 }
             }
