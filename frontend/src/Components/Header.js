@@ -11,6 +11,7 @@ const Header = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+  
 
   const loginRef = useRef(null);
   const registerRef = useRef(null);
@@ -58,6 +59,45 @@ const Header = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showLogin, showRegister, showDropdown]);
+
+
+  const handleRegister = async (event) => {
+    event.preventDefault();
+  
+    const formData = new FormData(event.target);
+    const userData = {
+      user_id: 0, // Backend auto-generates this
+      email: formData.get("email"),
+      password: formData.get("password"),
+      first_name: formData.get("first_name"), // Fix: Name must match the form
+      last_name: formData.get("last_name"),   // Fix: Name must match the form
+      phone_number: "0000000000",
+      street: "Unknown",
+      address: "Unknown",
+      state: "Unknown",
+      district: "Unknown",
+      taluka: "Unknown",
+      village: "Unknown",
+      pincode: 0,
+    };
+  
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/auth/register`, userData, {
+        headers: { "Content-Type": "application/json" },
+      });
+  
+      if (response.status === 201) {
+        alert("Registration successful!");
+      } else {
+        alert("Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      alert(error.response?.data?.detail || "Registration failed.");
+    }
+  };
+  
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -135,7 +175,7 @@ const Header = () => {
           <nav>
             <ul className="nav-links">
               <li><a href="/" className="nav-link">Home</a></li>
-              <li><a href="/products" className="nav-link">Products</a></li>
+              <li><a href="/ProductItem" className="nav-link">Products</a></li>
               <li><a href="/wishlist" className="nav-link"><i className="fas fa-heart"></i> Wishlist</a></li>
               <li><a href="/cart" className="nav-link"><i className="fas fa-shopping-cart"></i> Cart</a></li>
               <li><a href="/orders" className="nav-link"><i className="fas fa-cart-arrow-down"></i> Order</a></li>
@@ -197,13 +237,17 @@ const Header = () => {
         <div className="popup-overlay">
           <div className="popup-container" ref={registerRef}>
             <h4>Register</h4>
-            <form>
-              <input type="text" placeholder="Full Name" required />
-              <input type="email" placeholder="Email" required />
-              <input type="password" placeholder="Password" required />
-              <button type="submit" className="btn btn-primary">Register</button>
-              <p className="toggle-text">Already registered? <span onClick={openLogin}>Login</span></p>
-            </form>
+            <form onSubmit={handleRegister}>
+            <input type="text" name="first_name" placeholder="First Name" required />
+<input type="text" name="last_name" placeholder="Last Name" required />
+  <input type="email" name="email" placeholder="Email" required />
+  <input type="password" name="password" placeholder="Password" required />
+  <button type="submit" className="btn btn-primary">Register</button>
+  <p className="toggle-text">
+    Already registered? <span onClick={openLogin}>Login</span>
+  </p>
+</form>
+
           </div>
         </div>
       )}

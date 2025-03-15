@@ -3,7 +3,7 @@ import axios from "axios";
 import "../../Css/Order.css";
 //import {Backend_url} from  "../../../config.json"
 
-const Orders = () => {
+const Orders = ({ setActivePage }) => {
   const [orders, setOrders] = useState([]);
   const [users, setUsers] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
@@ -98,14 +98,13 @@ const Orders = () => {
   }
 
   return (
-    <div className="orders-page">
-      <h1>Orders</h1>
+    <div className="order-container">
 
-      <div className="orders-header">
+<div className="orders-header">
         <input
           type="text"
+          placeholder="Search products..."
           className="search-bar"
-          placeholder="Search by User ID..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />

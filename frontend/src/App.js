@@ -14,6 +14,7 @@ import Profile from "./Components/Profile";
 import EditProfile from "./Components/EditProfile";
 import Checkout from "./Components/Checkout";
 import Orders from "./Components/Orders";
+import Product from "./Components/ProductItem";
 
 
 function Layout({ setUserRole }) {
@@ -32,6 +33,7 @@ function Layout({ setUserRole }) {
           <Route path="/edit-profile" element={<EditProfile />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/orders" element={<Orders />} />
+          <Route path="/ProductItem" element={<Product />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>

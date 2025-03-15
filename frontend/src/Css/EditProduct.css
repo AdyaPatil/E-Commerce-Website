@@ -1,94 +1,125 @@
+.content{
+  margin-top: 20px;
+}
+
 .edit-product-container {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #fff;
-    padding: 20px;
-    width: 400px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  padding: 25px;
+  width: 420px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+      opacity: 0;
+      transform: translate(-50%, -55%);
   }
-  
-  .edit-product-container h2 {
-    text-align: center;
-    margin-bottom: 15px;
-    color: #333;
+  to {
+      opacity: 1;
+      transform: translate(-50%, -50%);
   }
-  
-  .edit-product-container form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+}
+
+.edit-product-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.edit-product-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.edit-product-container input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border 0.3s ease-in-out;
+}
+
+.edit-product-container input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.product-image {
+  display: block;
+  margin: 15px auto;
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.save-btn,
+.cancel-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.3s ease-in-out;
+}
+
+.save-btn {
+  background: #28a745;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #218838;
+}
+
+.cancel-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background: #c82333;
+}
+
+/* Overlay to disable background clicks */
+.edit-product-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  animation: fadeOverlay 0.3s ease-in-out;
+}
+
+@keyframes fadeOverlay {
+  from {
+      opacity: 0;
   }
-  
-  .edit-product-container input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
+  to {
+      opacity: 1;
   }
-  
-  .edit-product-container input:focus {
-    outline: none;
-    border-color: #007bff;
-  }
-  
-  .product-image {
-    display: block;
-    margin: 10px auto;
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-  }
-  
-  .btn-container {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-  }
-  
-  .save-btn,
-  .cancel-btn {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    margin: 5px;
-  }
-  
-  .save-btn {
-    background: #28a745;
-    color: white;
-  }
-  
-  .save-btn:hover {
-    background: #218838;
-  }
-  
-  .cancel-btn {
-    background: #dc3545;
-    color: white;
-  }
-  
-  .cancel-btn:hover {
-    background: #c82333;
-  }
-  
-  /* Overlay to disable background clicks */
-  .edit-product-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-  }
-  
+}

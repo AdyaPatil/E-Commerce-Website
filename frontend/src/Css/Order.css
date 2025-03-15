@@ -1,108 +1,137 @@
-.orders-page {
-    padding: 20px;
-    margin-left: 260px;
-  }
-  
-  .orders-page h1 {
-    margin-bottom: 20px;
-    text-align: center;
-    color: #333;
-  }
-  
-  .orders-header{
-    margin-left: 1080px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
+.order-container {
+  padding: 20px;
+  margin-left: 250px; /* Adjust for sidebar */
+}
 
-  .orders-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 0 auto;
-  }
-  
-  .orders-table th,
-  .orders-table td {
-    padding: 12px;
-    text-align: center;
-    border: 1px solid #ddd;
-  }
-  
-  .orders-table th {
-    background-color: #f4f4f4;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  .orders-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  .orders-table tr:hover {
-    background-color: #f1f1f1;
-  }
-  
-  .orders-table .status {
-    font-weight: bold;
-    padding: 8px;
-    border-radius: 4px;
-  }
-  
-  .orders-table .status.pending {
-    color: #e67e22;
-    background-color: #fef5e6;
-  }
-  
-  .orders-table .status.completed {
-    color: #27ae60;
-    background-color: #eafaf1;
-  }
-  
-  .orders-table .status.shipped {
-    color: #3498db;
-    background-color: #eef7fd;
-  }
-  
-  .orders-table .status.cancelled {
-    color: #e74c3c;
-    background-color: #fdecea;
-  }
 
-  .orders-table .edit-btn {
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    margin-right: 5px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 0.9em;
-  }
-  
-  .orders-table .delete-btn {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 0.9em;
-  }
-  
-  .orders-table .edit-btn:hover {
-    background-color: #45a049;
-  }
-  
-  .orders-table .delete-btn:hover {
-    background-color: #e53935;
-  }
-  
-  .search-bar {
-    margin-right: 2000px;
-    padding: 8px 12px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 250px;
-  }
+.orders-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 250px;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+/* Table Styling */
+.orders-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.orders-table thead {
+  background: #007bff;
+  color: white;
+}
+
+.orders-table td {
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+.orders-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+  color: #333;
+}
+
+.orders-table tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.orders-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Order Status Dropdown */
+.orders-table select {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.orders-table select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+/* Order Status Colors */
+.status {
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: 4px;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+}
+
+.status.pending {
+  color: #e67e22;
+  background-color: #fef5e6;
+}
+
+.status.shipped {
+  color: #3498db;
+  background-color: #eef7fd;
+}
+
+.status.completed {
+  color: #27ae60;
+  background-color: #eafaf1;
+}
+
+.status.cancelled {
+  color: #e74c3c;
+  background-color: #fdecea;
+}
+
+/* Buttons */
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.delete-btn:hover {
+  background-color: #e53935;
+}
+
+/* Loading and Error Messages */
+.loading-message,
+.error-message {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #e74c3c;
+  margin-top: 20px;
+}

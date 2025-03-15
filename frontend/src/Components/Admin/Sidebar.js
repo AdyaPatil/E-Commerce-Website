@@ -58,6 +58,9 @@ const Sidebar = ({ setActivePage }) => {
         <li onClick={() => setActivePage("orders")}>
           <FaShoppingCart /> Orders
         </li>
+        <li onClick={() => setActivePage("category")}>
+          <FaShoppingCart /> Category
+        </li>
         <li onClick={() => setActivePage("products")}>
           <FaShoppingCart /> Product
         </li>

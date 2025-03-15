@@ -7,6 +7,7 @@ import Customers from "./Customers";
 import Products from "./Products";
 import AddProduct from "./AddProduct";
 import EditProduct from "./EditProduct";
+import Category from "./Category";
 
 const AdminDashboard = () => {
   const [activePage, setActivePage] = useState("dashboard");
@@ -18,8 +19,12 @@ const AdminDashboard = () => {
       <Navbar />
       <div className="content">
         {activePage === "dashboard" && <Dashboard />}
-        {activePage === "orders" && <Orders />}
+        {activePage === "orders" && 
+        (<Orders setActivePage={setActivePage} setSelectedProduct={setSelectedProduct} />)}
         {activePage === "customers" && <Customers />}
+        {activePage === "category" && <Category />
+        //  (<Category setActivePage={setActivePage} setSelectedProduct={setSelectedProduct} />)
+        }
         {activePage === "products" && (
           <Products setActivePage={setActivePage} setSelectedProduct={setSelectedProduct} />
         )}

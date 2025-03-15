@@ -25,11 +25,17 @@ const MainBody = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-	console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
+        console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
         const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/products/`);
         const data = await response.json();
         console.log("Fetched Products:", data); // Debugging
-        setProducts(data);
+  
+        // Shuffle function
+        const shuffleArray = (array) => {
+          return array.sort(() => Math.random() - 0.5);
+        };
+  
+        setProducts(shuffleArray(data)); // Set shuffled products
       } catch (error) {
         console.error("Error fetching products:", error);
       } finally {
