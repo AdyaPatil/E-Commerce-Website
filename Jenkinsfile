@@ -49,11 +49,15 @@ pipeline {
         stage('Build and Push Images') {
             steps {
                 script {
+                    def BUILD_VERSION = "v${env.BUILD_NUMBER}"
                     sh """
-                    docker build -t adi2634/frontend-react:latest -f frontend/Dockerfile frontend
-                    docker build -t adi2634/backend-python:latest -f Backend/Dockerfile Backend
+                    docker build -t adi2634/frontend-react:latest -t adi2634/frontend-react:${BUILD_VERSION} -f frontend/Dockerfile frontend
+                    docker build -t adi2634/backend-python:latest -t adi2634/backend-python:${BUILD_VERSION} -f Backend/Dockerfile Backend
+                    
                     docker push adi2634/frontend-react:latest
+                    docker push adi2634/frontend-react:${BUILD_VERSION}
                     docker push adi2634/backend-python:latest
+                    docker push adi2634/backend-python:${BUILD_VERSION}
                     """
                 }
             }
