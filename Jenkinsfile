@@ -3,6 +3,7 @@ pipeline {
     environment {
         AWS_REGION = "ap-south-1"  // AWS region
         CLUSTER_NAME = "EcomEKSCluster" // EKS cluster name
+        SONAR_PROJECT_KEY = "EcomProject"  // Define SonarQube project key
     }
     stages {
         stage('Clean Previous Workspace') {
@@ -31,6 +32,22 @@ pipeline {
                         # Cleanup: Remove config.json after creating the secret
                         rm -f config.json
                         '''
+                    }
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    withSonarQubeEnv('SonarQube-Scanner') {  // Use configured SonarQube instance
+                        sh """
+                        sonar-scanner \
+                          -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
+                          -Dsonar.sources=. \
+                          -Dsonar.host.url=http://13.200.247.68:9000 \
+                          -Dsonar.login=${SONAR_TOKEN}
+                        """
                     }
                 }
             }
@@ -95,6 +112,16 @@ pipeline {
                     kubectl apply -f frontend-service.yaml 
                     kubectl apply -f backend-service.yaml 
                     """
+                }
+            }
+        }
+
+        stage('SonarQube Quality Gate') {
+            steps {
+                script {
+                    timeout(time: 5, unit: 'MINUTES') {
+                        waitForQualityGate abortPipeline: true
+                    }
                 }
             }
         }
