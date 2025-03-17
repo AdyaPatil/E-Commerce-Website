@@ -39,19 +39,20 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                script {
-                    withSonarQubeEnv('SonarQube-Scanner') {  // Use configured SonarQube instance
+                withSonarQubeEnv('SonarQube-Scanner') {
+                    withCredentials([string(credentialsId: 'sonarqube_token', variable: 'sonarqube_token')]) {
                         sh """
-                        sonar-scanner \
-                          -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                          -Dsonar.sources=. \
-                          -Dsonar.host.url=http://13.200.247.68:9000 \
-                          -Dsonar.login=${sonarqube-token}
+                            sonar-scanner \
+                            -Dsonar.projectKey=E-Commerce-Website \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=http://your-sonarqube-url:9000 \
+                            -Dsonar.login=$sonarqube_token
                         """
                     }
                 }
             }
         }
+
 
         stage('Login to Docker Hub') {
             steps {
