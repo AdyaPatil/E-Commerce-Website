@@ -36,51 +36,38 @@ pipeline {
         SONARQUBE_SCANNER_HOME = tool 'SonarScanner'
     }
     steps {
-        withCredentials([string(credentialsId: 'sonarToken', variable: 'SONAR_TOKEN')]) {
+        withCredentials([string(credentialsId: 'sonarToken', variable: 'SONAR_TOKEN'),string(credentialsId: 'sonarIP', variable: 'SONAR_URL')]) {
             script {
-                echo "🔹 Checking SonarQube Server Connectivity..."
-                // Check if SonarQube is reachable
-                sh "curl -I http://13.200.247.68:9000 || echo 'SonarQube Server Not Reachable!'"
-
-                echo "🔹 Verifying SonarScanner Path..."
-                // Confirm SonarScanner path
-                sh "ls -la ${SONARQUBE_SCANNER_HOME}/bin"
-
-                echo "🔹 Checking SonarQube Authentication..."
-                // Test authentication
-                sh "curl -u ${SONAR_TOKEN}: http://13.200.247.68:9000/api/system/status || echo 'Authentication Failed!'"
-
                 dir('frontend') {
-                    echo "🔹 Running SonarQube Analysis for Frontend..."
-                    sh """
+                    sh '''
                     ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
                     -Dsonar.projectKey=ECommerce-React-Frontend \
                     -Dsonar.sources=src \
                     -Dsonar.language=js \
-                    -Dsonar.host.url=http://13.200.247.68:9000 \
+                    -Dsonar.host.url=${SONAR_URL} \
                     -Dsonar.login=${SONAR_TOKEN} \
                     -Dsonar.exclusions="**/node_modules/**, **/build/**" \
-                    -X  # Enable debug logging for sonar-scanner
-                    """
+                    -X
+                    '''
                 }
 
                 dir('Backend') {
-                    echo "🔹 Running SonarQube Analysis for Backend..."
-                    sh """
+                    sh '''
                     ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
                     -Dsonar.projectKey=ECommerce-FastAPI-Backend \
                     -Dsonar.sources=. \
                     -Dsonar.language=py \
-                    -Dsonar.host.url=http://13.200.247.68:9000 \
+                    -Dsonar.host.url=${SONAR_URL} \
                     -Dsonar.login=${SONAR_TOKEN} \
                     -Dsonar.exclusions="**/migrations/**, **/__pycache__/**, **/venv/**" \
-                    -X  # Enable debug logging for sonar-scanner
-                    """
+                    -X
+                    '''
                 }
             }
         }
     }
 }
+
 
 
         stage('Login to Docker Hub') {
