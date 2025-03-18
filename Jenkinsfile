@@ -42,16 +42,33 @@ pipeline {
             }
             steps {
                 withCredentials([string(credentialsId: 'sonarToken', variable: 'SONAR_TOKEN'),string(credentialsId: 'sonarServer', variable: 'SONAR_URL')]) {
-                    script {
-                        sh """
-                        ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
-                        -Dsonar.projectKey=ECommerce-Website \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=${SONAR_URL} \
-                        -Dsonar.login=${SONAR_TOKEN}
-                        """
-                    }
+            script {
+                // Analyzing React Frontend
+                dir('frontend') {
+                    sh """
+                    ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
+                    -Dsonar.projectKey=ECommerce-React-Frontend \
+                    -Dsonar.sources=src \
+                    -Dsonar.language=js \
+                    -Dsonar.host.url=${SONAR_URL} \
+                    -Dsonar.login=${SONAR_TOKEN} \
+                    -Dsonar.exclusions="**/node_modules/**, **/build/**"
+                    """
                 }
+
+                // Analyzing FastAPI Backend
+                dir('Backend') {
+                    sh """
+                    ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
+                    -Dsonar.projectKey=ECommerce-FastAPI-Backend \
+                    -Dsonar.sources=. \
+                    -Dsonar.language=py \
+                    -Dsonar.host.url=${SONAR_URL} \
+                    -Dsonar.login=${SONAR_TOKEN} \
+                    -Dsonar.exclusions="**/migrations/**, **/__pycache__/**, **/venv/**"
+                    """
+                }
+            }
             }
         }
 
