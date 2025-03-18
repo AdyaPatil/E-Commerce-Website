@@ -36,6 +36,25 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            environment {
+                SONARQUBE_SCANNER_HOME = tool 'SonarScanner' 
+            }
+            steps {
+                withCredentials([string(credentialsId: 'sonarToken', variable: 'SONAR_TOKEN'),string(credentialsId: 'sonarServer', variable: 'SONAR_URL')]) {
+                    script {
+                        sh """
+                        ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
+                        -Dsonar.projectKey=ECommerce-Website \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=${SONAR_URL} \
+                        -Dsonar.login=${SONAR_TOKEN}
+                        """
+                    }
+                }
+            }
+        }
+
         stage('Login to Docker Hub') {
             steps {
                 script {
@@ -53,7 +72,7 @@ pipeline {
                     sh """
                     docker build -t adi2634/frontend-react:latest -t adi2634/frontend-react:${BUILD_VERSION} -f frontend/Dockerfile frontend
                     docker build -t adi2634/backend-python:latest -t adi2634/backend-python:${BUILD_VERSION} -f Backend/Dockerfile Backend
-                    
+
                     docker push adi2634/frontend-react:latest
                     docker push adi2634/frontend-react:${BUILD_VERSION}
                     docker push adi2634/backend-python:latest
@@ -71,7 +90,7 @@ pipeline {
                         export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
                         export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
                         export AWS_DEFAULT_REGION=${AWS_REGION}
-                        
+
                         aws configure set aws_access_key_id ${AWS_ACCESS_KEY_ID}
                         aws configure set aws_secret_access_key ${AWS_SECRET_ACCESS_KEY}
                         aws configure set region ${AWS_REGION}
@@ -91,9 +110,9 @@ pipeline {
                     kubectl apply -f frontend-config.yaml
                     kubectl apply -f frontend-deployment.yaml
                     kubectl rollout restart deployment frontend-deployment
-                    kubectl apply -f backend-deployment.yaml 
-                    kubectl apply -f frontend-service.yaml 
-                    kubectl apply -f backend-service.yaml 
+                    kubectl apply -f backend-deployment.yaml
+                    kubectl apply -f frontend-service.yaml
+                    kubectl apply -f backend-service.yaml
                     """
                 }
             }
