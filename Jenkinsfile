@@ -36,7 +36,7 @@ pipeline {
                 SONARQUBE_SCANNER_HOME = tool 'SonarScanner'
             }
             steps {
-                withCredentials([string(credentialsId: 'sonarToken', variable: 'SONAR_TOKEN'), string(credentialsId: 'sonarServer', variable: 'SONAR_URL')]) {
+                withCredentials([string(credentialsId: 'sonarToken', variable: 'SONAR_TOKEN')]) {
                     script {
                         dir('frontend') {
                             sh """
@@ -44,7 +44,7 @@ pipeline {
                             -Dsonar.projectKey=ECommerce-React-Frontend \
                             -Dsonar.sources=src \
                             -Dsonar.language=js \
-                            -Dsonar.host.url=${SONAR_URL} \
+                            -Dsonar.host.url=http://13.200.247.68:9000 \
                             -Dsonar.login=${SONAR_TOKEN} \
                             -Dsonar.exclusions="**/node_modules/**, **/build/**"
                             """
@@ -55,7 +55,7 @@ pipeline {
                             -Dsonar.projectKey=ECommerce-FastAPI-Backend \
                             -Dsonar.sources=. \
                             -Dsonar.language=py \
-                            -Dsonar.host.url=${SONAR_URL} \
+                            -Dsonar.host.url=http://13.200.247.68:9000 \
                             -Dsonar.login=${SONAR_TOKEN} \
                             -Dsonar.exclusions="**/migrations/**, **/__pycache__/**, **/venv/**"
                             """
