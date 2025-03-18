@@ -32,52 +32,56 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
-            environment {
-                SONARQUBE_SCANNER_HOME = tool 'SonarScanner'
-            }
-            steps {
-                withCredentials([string(credentialsId: 'sonarToken', variable: 'SONAR_TOKEN')]) {
-                    script {
-                        echo "🔹 Checking SonarQube Server Connectivity..."
-                        sh "curl -I http://13.200.247.68:9000 || echo 'SonarQube Server Not Reachable!'"
+    environment {
+        SONARQUBE_SCANNER_HOME = tool 'SonarScanner'
+    }
+    steps {
+        withCredentials([string(credentialsId: 'sonarToken', variable: 'SONAR_TOKEN')]) {
+            script {
+                echo "🔹 Checking SonarQube Server Connectivity..."
+                // Check if SonarQube is reachable
+                sh "curl -I http://13.200.247.68:9000 || echo 'SonarQube Server Not Reachable!'"
 
-                        echo "🔹 Verifying SonarScanner Path..."
-                        sh "ls -la ${SONARQUBE_SCANNER_HOME}/bin"
+                echo "🔹 Verifying SonarScanner Path..."
+                // Confirm SonarScanner path
+                sh "ls -la ${SONARQUBE_SCANNER_HOME}/bin"
 
-                        echo "🔹 Checking SonarQube Authentication..."
-                        sh "curl -u ${SONAR_TOKEN}: http://13.200.247.68:9000/api/system/status || echo 'Authentication Failed!'"
+                echo "🔹 Checking SonarQube Authentication..."
+                // Test authentication
+                sh "curl -u ${SONAR_TOKEN}: http://13.200.247.68:9000/api/system/status || echo 'Authentication Failed!'"
 
-                        dir('frontend') {
-                            echo "🔹 Running SonarQube Analysis for Frontend..."
-                            sh """
-                            ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
-                            -Dsonar.projectKey=ECommerce-React-Frontend \
-                            -Dsonar.sources=src \
-                            -Dsonar.language=js \
-                            -Dsonar.host.url=http://13.200.247.68:9000 \
-                            -Dsonar.login=${SONAR_TOKEN} \
-                            -Dsonar.exclusions="**/node_modules/**, **/build/**" \
-                            -X
-                            """
-                        }
+                dir('frontend') {
+                    echo "🔹 Running SonarQube Analysis for Frontend..."
+                    sh """
+                    ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
+                    -Dsonar.projectKey=ECommerce-React-Frontend \
+                    -Dsonar.sources=src \
+                    -Dsonar.language=js \
+                    -Dsonar.host.url=http://13.200.247.68:9000 \
+                    -Dsonar.login=${SONAR_TOKEN} \
+                    -Dsonar.exclusions="**/node_modules/**, **/build/**" \
+                    -X  # Enable debug logging for sonar-scanner
+                    """
+                }
 
-                        dir('Backend') {
-                            echo "🔹 Running SonarQube Analysis for Backend..."
-                            sh """
-                            ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
-                            -Dsonar.projectKey=ECommerce-FastAPI-Backend \
-                            -Dsonar.sources=. \
-                            -Dsonar.language=py \
-                            -Dsonar.host.url=http://13.200.247.68:9000 \
-                            -Dsonar.login=${SONAR_TOKEN} \
-                            -Dsonar.exclusions="**/migrations/**, **/__pycache__/**, **/venv/**" \
-                            -X
-                            """
-                        }
-                    }
+                dir('Backend') {
+                    echo "🔹 Running SonarQube Analysis for Backend..."
+                    sh """
+                    ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
+                    -Dsonar.projectKey=ECommerce-FastAPI-Backend \
+                    -Dsonar.sources=. \
+                    -Dsonar.language=py \
+                    -Dsonar.host.url=http://13.200.247.68:9000 \
+                    -Dsonar.login=${SONAR_TOKEN} \
+                    -Dsonar.exclusions="**/migrations/**, **/__pycache__/**, **/venv/**" \
+                    -X  # Enable debug logging for sonar-scanner
+                    """
                 }
             }
         }
+    }
+}
+
 
         stage('Login to Docker Hub') {
             steps {
@@ -108,19 +112,14 @@ pipeline {
         stage('Authenticate with Kubernetes') {
             steps {
                 script {
-                    withCredentials([[
-                        $class: 'AmazonWebServicesCredentialsBinding',
-                        credentialsId: '340752823814',
-                        accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                        secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                    ]]) {
-                        sh """
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '340752823814', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                        sh '''
                         export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
                         export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
                         export AWS_DEFAULT_REGION=${AWS_REGION}
                         aws eks update-kubeconfig --name ${CLUSTER_NAME} --region ${AWS_REGION}
                         kubectl config current-context
-                        """
+                        '''
                     }
                 }
             }
@@ -129,14 +128,14 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    sh """
+                    sh '''
                     kubectl apply -f frontend-config.yaml
                     kubectl apply -f frontend-deployment.yaml
                     kubectl rollout restart deployment frontend-deployment
                     kubectl apply -f backend-deployment.yaml
                     kubectl apply -f frontend-service.yaml
                     kubectl apply -f backend-service.yaml
-                    """
+                    '''
                 }
             }
         }
