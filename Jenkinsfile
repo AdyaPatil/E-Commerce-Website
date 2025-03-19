@@ -110,22 +110,6 @@ pipeline {
             }
         }
 
-        stage('Trivy Scan for Vulnerabilities') {
-            steps {
-                script {
-                    echo "Running Trivy Scan for Frontend Image..."
-                    sh """
-                    trivy image adi2634/frontend-react:latest --severity HIGH,CRITICAL || true
-                    """
-
-                    echo "Running Trivy Scan for Backend Image..."
-                    sh """
-                    trivy image adi2634/backend-python:latest --severity HIGH,CRITICAL || true
-                    """
-                }
-            }
-        }
-
         stage('Authenticate with Kubernetes') {
             steps {
                 script {
