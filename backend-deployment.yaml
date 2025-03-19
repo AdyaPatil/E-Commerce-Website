@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: adi2634/image:test  # Replace with your actual image
+          image: adi2634/backend-python:latest  # Replace with your actual image
           ports:
             - containerPort: 8000
           envFrom:
