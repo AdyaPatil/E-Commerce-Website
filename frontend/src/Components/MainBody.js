@@ -25,10 +25,10 @@ const MainBody = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        console.log("Backend URL:", process.env.REACT_APP_BACKEND_URL);
+        
         const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/products/`);
         const data = await response.json();
-        console.log("Fetched Products:", data); // Debugging
+  
   
         // Shuffle function
         const shuffleArray = (array) => {
@@ -70,7 +70,6 @@ const MainBody = () => {
       }
   
       const cartData = await cartResponse.json();
-      console.log(cartData);
   
       // Check if the product is already in the cart
       const productExists = cartData.some(item => item.product_id === product.product_id);
