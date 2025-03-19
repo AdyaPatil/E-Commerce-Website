@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: adi2634/image:front
+          image: adi2634/frontend-react:latest
           ports:
             - containerPort: 3600
           env:
