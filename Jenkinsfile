@@ -31,6 +31,18 @@ pipeline {
             }
         }
 
+        stage('Debug Sonar Environment') {
+    steps {
+        sh '''
+        echo "SonarQube Scanner Path: ${SONARQUBE_SCANNER_HOME}"
+        echo "SonarQube URL: ${SONAR_URL}"
+        echo "SonarQube Token: ${SONAR_TOKEN}"
+        ls -la ${SONARQUBE_SCANNER_HOME}/bin
+        '''
+    }
+}
+
+
         stage('SonarQube Analysis') {
     environment {
         SONARQUBE_SCANNER_HOME = tool 'SonarScanner'
