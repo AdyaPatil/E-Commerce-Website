@@ -18,17 +18,18 @@ pipeline {
         }
 
         stage('Retrieve config.json from Jenkins Secrets') {
-    steps {
-        script {
-            withCredentials([string(credentialsId: 'CONFIG_JSON', variable: 'CONFIG_JSON_CONTENT')]) {
-                sh '''
-                kubectl delete secret config-secret --ignore-not-found
-                echo "$CONFIG_JSON_CONTENT" | kubectl create secret generic config-secret --from-literal=config.json="$(cat -)"
-                '''
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'CONFIG_JSON', variable: 'CONFIG_JSON_CONTENT')]) {
+                        sh '''
+                        echo "$CONFIG_JSON_CONTENT" > config.json
+                        kubectl create secret generic config-secret --from-file=config.json --dry-run=client -o yaml | kubectl apply -f -
+                        rm -f config.json
+                        '''
+                    }
+                }
             }
         }
-    }
-}
 
 
         stage('Debug Sonar Environment') {
