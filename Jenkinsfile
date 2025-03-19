@@ -38,21 +38,8 @@ pipeline {
     steps {
         withCredentials([string(credentialsId: 'sonarToken', variable: 'SONAR_TOKEN'),string(credentialsId: 'sonarIP', variable: 'SONAR_URL')]) {
             script {
-                echo "🔹 Checking SonarQube Server Connectivity..."
-                // Check if SonarQube is reachable
-                sh "curl -I ${SONAR_URL} || echo 'SonarQube Server Not Reachable!'"
-
-                echo "🔹 Verifying SonarScanner Path..."
-                // Confirm SonarScanner path
-                sh "ls -la ${SONARQUBE_SCANNER_HOME}/bin"
-
-                echo "🔹 Checking SonarQube Authentication..."
-                // Test authentication
-                sh "curl -u ${SONAR_TOKEN}: ${SONAR_URL}/api/system/status || echo 'Authentication Failed!'"
-
                 dir('frontend') {
-                    echo "🔹 Running SonarQube Analysis for Frontend..."
-                    sh """
+                    sh '''
                     ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
                     -Dsonar.projectKey=ECommerce-React-Frontend \
                     -Dsonar.sources=src \
@@ -60,13 +47,12 @@ pipeline {
                     -Dsonar.host.url=${SONAR_URL} \
                     -Dsonar.login=${SONAR_TOKEN} \
                     -Dsonar.exclusions="**/node_modules/**, **/build/**" \
-                    -X  # Enable debug logging for sonar-scanner
-                    """
+                    -X
+                    '''
                 }
 
                 dir('Backend') {
-                    echo "🔹 Running SonarQube Analysis for Backend..."
-                    sh """
+                    sh '''
                     ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
                     -Dsonar.projectKey=ECommerce-FastAPI-Backend \
                     -Dsonar.sources=. \
@@ -74,8 +60,8 @@ pipeline {
                     -Dsonar.host.url=${SONAR_URL} \
                     -Dsonar.login=${SONAR_TOKEN} \
                     -Dsonar.exclusions="**/migrations/**, **/__pycache__/**, **/venv/**" \
-                    -X  # Enable debug logging for sonar-scanner
-                    """
+                    -X
+                    '''
                 }
             }
         }
