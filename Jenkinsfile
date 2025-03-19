@@ -31,6 +31,18 @@ pipeline {
             }
         }
 
+        stage('Debug Sonar Environment') {
+    steps {
+        sh '''
+        echo "SonarQube Scanner Path: ${SONARQUBE_SCANNER_HOME}"
+        echo "SonarQube URL: ${SONAR_URL}"
+        echo "SonarQube Token: ${SONAR_TOKEN}"
+        ls -la ${SONARQUBE_SCANNER_HOME}/bin
+        '''
+    }
+}
+
+
         stage('SonarQube Analysis') {
     environment {
         SONARQUBE_SCANNER_HOME = tool 'SonarScanner'
@@ -80,13 +92,39 @@ pipeline {
             }
         }
 
-        stage('Build and Push Images') {
+        stage('Build Docker Images') {
             steps {
                 script {
                     def BUILD_VERSION = "v${env.BUILD_NUMBER}"
                     sh """
                     docker build -t adi2634/frontend-react:latest -t adi2634/frontend-react:${BUILD_VERSION} -f frontend/Dockerfile frontend
                     docker build -t adi2634/backend-python:latest -t adi2634/backend-python:${BUILD_VERSION} -f Backend/Dockerfile Backend
+                    """
+                }
+            }
+        }
+
+        stage('Trivy Scan for Vulnerabilities') {
+            steps {
+                script {
+                    echo "Running Trivy Scan for Frontend Image..."
+                    sh """
+                    trivy image adi2634/frontend-react:latest --severity HIGH,CRITICAL || true
+                    """
+
+                    echo "Running Trivy Scan for Backend Image..."
+                    sh """
+                    trivy image adi2634/backend-python:latest --severity HIGH,CRITICAL || true
+                    """
+                }
+            }
+        }
+
+        stage('Push Docker Images to Docker Hub') {
+            steps {
+                script {
+                    def BUILD_VERSION = "v${env.BUILD_NUMBER}"
+                    sh """
                     docker push adi2634/frontend-react:latest
                     docker push adi2634/frontend-react:${BUILD_VERSION}
                     docker push adi2634/backend-python:latest
