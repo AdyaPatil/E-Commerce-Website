@@ -152,8 +152,11 @@ pipeline {
         stage('Authenticate with Kubernetes') {
             steps {
                 script {
-                    withAWS(credentials: 'aws-credentials-id', region: AWS_REGION) {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '340752823814', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                         sh '''
+                        export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+                        export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+                        export AWS_DEFAULT_REGION=${AWS_REGION}
                         aws eks update-kubeconfig --name ${CLUSTER_NAME} --region ${AWS_REGION}
                         kubectl config current-context
                         '''
@@ -168,19 +171,8 @@ pipeline {
                     sh '''
                     kubectl apply -f frontend-config.yaml
                     kubectl apply -f frontend-deployment.yaml
-                    if kubectl get deployment frontend-deployment; then
-                        kubectl rollout restart deployment frontend-deployment
-                    else
-                        echo "Frontend deployment not found"
-                    fi
-                    
+                    kubectl rollout restart deployment frontend-deployment
                     kubectl apply -f backend-deployment.yaml
-                    if kubectl get deployment backend-deployment; then
-                        kubectl rollout restart deployment backend-deployment
-                    else
-                        echo "Backend deployment not found"
-                    fi
-                    
                     kubectl apply -f frontend-service.yaml
                     kubectl apply -f backend-service.yaml
                     '''
