@@ -18,18 +18,19 @@ pipeline {
         }
 
         stage('Retrieve config.json from Jenkins Secrets') {
-            steps {
-                script {
-                    withCredentials([string(credentialsId: 'CONFIG_JSON', variable: 'CONFIG_JSON_CONTENT')]) {
-                        sh '''
-                        echo "$CONFIG_JSON_CONTENT" > config.json
-                        kubectl create secret generic config-secret --from-file=config.json --dry-run=client -o yaml | kubectl apply -f -
-                        rm -f config.json
-                        '''
-                    }
-                }
+    steps {
+        script {
+            withCredentials([string(credentialsId: 'CONFIG_JSON', variable: 'CONFIG_JSON_CONTENT')]) {
+                sh '''
+                echo "$CONFIG_JSON_CONTENT" > config.json
+                kubectl create configmap config-json --from-file=config.json --dry-run=client -o yaml | kubectl apply -f -
+                rm -f config.json
+                '''
             }
         }
+    }
+}
+
 
         stage('Create Kubernetes Secret for MongoDB') {
             steps {
