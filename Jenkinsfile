@@ -112,8 +112,8 @@ pipeline {
                 script {
                     def BUILD_VERSION = "v${env.BUILD_NUMBER}"
                     sh """
-                    docker build -t adi2634/frontend-react:latest -t adi2634/frontend-react:${BUILD_VERSION} -f frontend/Dockerfile frontend
-                    docker build -t adi2634/backend-python:latest -t adi2634/backend-python:${BUILD_VERSION} -f Backend/Dockerfile Backend
+                    docker build --no-cache -t adi2634/frontend-react:latest -t adi2634/frontend-react:v${BUILD_NUMBER} -f frontend/Dockerfile frontend
+                    docker build --no-cache -t adi2634/backend-python:latest -t adi2634/backend-python:v${BUILD_NUMBER} -f Backend/Dockerfile Backend
                     """
                 }
             }
