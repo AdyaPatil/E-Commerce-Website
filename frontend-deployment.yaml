@@ -15,6 +15,7 @@ spec:
       containers:
         - name: frontend
           image: adi2634/frontend-react:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 3600
           env:
