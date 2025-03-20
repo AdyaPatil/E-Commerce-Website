@@ -23,5 +23,5 @@ spec:
               subPath: "config.json"
       volumes:
         - name: config-volume
-          secret:
-            secretName: config-secret
+          configMap:
+            name: config-json  # Mount from ConfigMap
