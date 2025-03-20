@@ -17,12 +17,11 @@ spec:
           image: adi2634/backend-python:latest  # Replace with your actual image
           ports:
             - containerPort: 8000
-          env:
-            - name: MONGO_DB_URL
-              valueFrom:
-                secretKeyRef:
-                  name: mongo-secret
-                  key: MONGO_DB_URL
-          envFrom:
-            - configMapRef:
-                name: ecommerce-config  # Other environment variables from ConfigMap
+          volumeMounts:
+            - name: config-volume
+              mountPath: "/app/Backend/config.json"
+              subPath: "config.json"
+      volumes:
+        - name: config-volume
+          secret:
+            secretName: config-secret
