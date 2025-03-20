@@ -19,7 +19,7 @@ spec:
             - containerPort: 8000
           volumeMounts:
             - name: config-volume
-              mountPath: "/app/config.json"
+              mountPath: "/app/Backend/config.json"
               subPath: "config.json"
       volumes:
         - name: config-volume
