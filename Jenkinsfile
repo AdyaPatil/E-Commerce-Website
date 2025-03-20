@@ -18,19 +18,18 @@ pipeline {
         }
 
         stage('Retrieve config.json from Jenkins Secrets') {
-    steps {
-        script {
-            withCredentials([string(credentialsId: 'CONFIG_JSON', variable: 'CONFIG_JSON_CONTENT')]) {
-                sh '''
-                echo "$CONFIG_JSON_CONTENT" > config.json
-                kubectl create configmap config-json --from-file=config.json --dry-run=client -o yaml | kubectl apply -f -
-                rm -f config.json
-                '''
+            steps {
+                script {
+                    withCredentials([string(credentialsId: 'CONFIG_JSON', variable: 'CONFIG_JSON_CONTENT')]) {
+                        sh '''
+                        echo "$CONFIG_JSON_CONTENT" > config.json
+                        kubectl create configmap config-json --from-file=config.json --dry-run=client -o yaml | kubectl apply -f -
+                        rm -f config.json
+                        '''
+                    }
+                }
             }
         }
-    }
-}
-
 
         stage('Create Kubernetes Secret for MongoDB') {
             steps {
@@ -45,62 +44,63 @@ pipeline {
             }
         }
 
-
         stage('Debug Sonar Environment') {
-    steps {
-        sh '''
-        echo "SonarQube Scanner Path: ${SONARQUBE_SCANNER_HOME}"
-        echo "SonarQube URL: ${SONAR_URL}"
-        echo "SonarQube Token: ${SONAR_TOKEN}"
-        ls -la ${SONARQUBE_SCANNER_HOME}/bin
-        '''
-    }
-}
-
+            steps {
+                sh '''
+                if [ -d "${SONARQUBE_SCANNER_HOME}/bin" ]; then 
+                    echo "Sonar Scanner found"; 
+                else 
+                    echo "Sonar Scanner not found"; 
+                    exit 1; 
+                fi
+                echo "SonarQube URL: ${SONAR_URL}"
+                echo "SonarQube Token: ${SONAR_TOKEN}"
+                '''
+            }
+        }
 
         stage('SonarQube Analysis') {
-    environment {
-        SONARQUBE_SCANNER_HOME = tool 'SonarScanner'
-    }
-    steps {
-        withCredentials([string(credentialsId: 'sonarToken', variable: 'SONAR_TOKEN'),string(credentialsId: 'sonarIP', variable: 'SONAR_URL')]) {
-            script {
-                dir('frontend') {
-                    sh '''
-                    ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
-                    -Dsonar.projectKey=ECommerce-React-Frontend \
-                    -Dsonar.sources=src \
-                    -Dsonar.language=js \
-                    -Dsonar.host.url=${SONAR_URL} \
-                    -Dsonar.login=${SONAR_TOKEN} \
-                    -Dsonar.exclusions="**/node_modules/**, **/build/**" \
-                    -X
-                    '''
-                }
+            environment {
+                SONARQUBE_SCANNER_HOME = tool 'SonarScanner'
+            }
+            steps {
+                withCredentials([string(credentialsId: 'sonarToken', variable: 'SONAR_TOKEN'),
+                                 string(credentialsId: 'sonarIP', variable: 'SONAR_URL')]) {
+                    script {
+                        dir('frontend') {
+                            sh '''
+                            ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
+                            -Dsonar.projectKey=ECommerce-React-Frontend \
+                            -Dsonar.sources=src \
+                            -Dsonar.host.url=${SONAR_URL} \
+                            -Dsonar.login=${SONAR_TOKEN} \
+                            -Dsonar.exclusions="**/node_modules/**,**/build/**" \
+                            -X
+                            '''
+                        }
 
-                dir('Backend') {
-                    sh '''
-                    ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
-                    -Dsonar.projectKey=ECommerce-FastAPI-Backend \
-                    -Dsonar.sources=. \
-                    -Dsonar.language=py \
-                    -Dsonar.host.url=${SONAR_URL} \
-                    -Dsonar.login=${SONAR_TOKEN} \
-                    -Dsonar.exclusions="**/migrations/**, **/__pycache__/**, **/venv/**" \
-                    -X
-                    '''
+                        dir('Backend') {
+                            sh '''
+                            ${SONARQUBE_SCANNER_HOME}/bin/sonar-scanner \
+                            -Dsonar.projectKey=ECommerce-FastAPI-Backend \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=${SONAR_URL} \
+                            -Dsonar.login=${SONAR_TOKEN} \
+                            -Dsonar.exclusions="**/migrations/**,**/__pycache__/**,**/venv/**" \
+                            -X
+                            '''
+                        }
+                    }
                 }
             }
         }
-    }
-}
-
-
 
         stage('Login to Docker Hub') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKER_HUB_USER', passwordVariable: 'DOCKER_HUB_PASS')]) {
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', 
+                                                      usernameVariable: 'DOCKER_HUB_USER', 
+                                                      passwordVariable: 'DOCKER_HUB_PASS')]) {
                         sh "echo $DOCKER_HUB_PASS | docker login -u $DOCKER_HUB_USER --password-stdin"
                     }
                 }
@@ -112,8 +112,8 @@ pipeline {
                 script {
                     def BUILD_VERSION = "v${env.BUILD_NUMBER}"
                     sh """
-                    docker build --no-cache -t adi2634/frontend-react:latest -t adi2634/frontend-react:v${BUILD_NUMBER} -f frontend/Dockerfile frontend
-                    docker build --no-cache -t adi2634/backend-python:latest -t adi2634/backend-python:v${BUILD_NUMBER} -f Backend/Dockerfile Backend
+                    docker build --platform linux/amd64 --no-cache -t adi2634/frontend-react:latest -t adi2634/frontend-react:${BUILD_VERSION} -f frontend/Dockerfile frontend
+                    docker build --platform linux/amd64 --no-cache -t adi2634/backend-python:latest -t adi2634/backend-python:${BUILD_VERSION} -f Backend/Dockerfile Backend
                     """
                 }
             }
@@ -124,12 +124,12 @@ pipeline {
                 script {
                     echo "Running Trivy Scan for Frontend Image..."
                     sh """
-                    trivy image adi2634/frontend-react:latest --severity HIGH,CRITICAL || true
+                    trivy image adi2634/frontend-react:latest --severity HIGH,CRITICAL --exit-code 1 || echo "Vulnerabilities found!"
                     """
 
                     echo "Running Trivy Scan for Backend Image..."
                     sh """
-                    trivy image adi2634/backend-python:latest --severity HIGH,CRITICAL || true
+                    trivy image adi2634/backend-python:latest --severity HIGH,CRITICAL --exit-code 1 || echo "Vulnerabilities found!"
                     """
                 }
             }
@@ -152,11 +152,8 @@ pipeline {
         stage('Authenticate with Kubernetes') {
             steps {
                 script {
-                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: '340752823814', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                    withAWS(credentials: 'aws-credentials-id', region: AWS_REGION) {
                         sh '''
-                        export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-                        export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-                        export AWS_DEFAULT_REGION=${AWS_REGION}
                         aws eks update-kubeconfig --name ${CLUSTER_NAME} --region ${AWS_REGION}
                         kubectl config current-context
                         '''
@@ -171,8 +168,19 @@ pipeline {
                     sh '''
                     kubectl apply -f frontend-config.yaml
                     kubectl apply -f frontend-deployment.yaml
-                    kubectl rollout restart deployment frontend-deployment
+                    if kubectl get deployment frontend-deployment; then
+                        kubectl rollout restart deployment frontend-deployment
+                    else
+                        echo "Frontend deployment not found"
+                    fi
+                    
                     kubectl apply -f backend-deployment.yaml
+                    if kubectl get deployment backend-deployment; then
+                        kubectl rollout restart deployment backend-deployment
+                    else
+                        echo "Backend deployment not found"
+                    fi
+                    
                     kubectl apply -f frontend-service.yaml
                     kubectl apply -f backend-service.yaml
                     '''
