@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: backend-deployment
 spec:
-  replicas: 1  # Number of backend pods
+  replicas: 1
   selector:
     matchLabels:
       app: backend
@@ -14,14 +14,14 @@ spec:
     spec:
       containers:
         - name: backend
-          image: adi2634/backend-python:latest  # Replace with your actual image
+          image: adi2634/backend-python:latest
           ports:
             - containerPort: 8000
           volumeMounts:
             - name: config-volume
-              mountPath: "/app/Backend/config.json"
+              mountPath: "/app/config.json"
               subPath: "config.json"
       volumes:
         - name: config-volume
           configMap:
-            name: config-json  # Mount from ConfigMap
+            name: config-json
